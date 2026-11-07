@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수어 학습 놀이터</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:#1f2937;
+  font-family:"Pretendard","Malgun Gothic","맑은 고딕",sans-serif;
+  background-color:#f5f8fc;
+  background-image:
+    radial-gradient(circle at 0% 0%,#ffe8cc 0,transparent 35%),
+    radial-gradient(circle at 100% 0%,#d0ebff 0,transparent 35%);
+  background-attachment:fixed;
+}
+
+/* ----- 상단 ----- */
+.top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid #e6ebf2}
+.top-inner{max-width:1000px;margin:0 auto;padding:12px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{font-size:34px}
+.brand h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.3px}
+.brand p{margin:2px 0 0;font-size:13px;color:#6b7280}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;background:#eef2f7;padding:4px;border-radius:14px}
+.tab{border:0;background:none;padding:9px 13px;border-radius:10px;font-family:inherit;font-size:15px;font-weight:600;color:#4b5563;cursor:pointer;white-space:nowrap}
+.tab.on{background:#fff;color:#1c7ed6;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.guide-btn{background:#ffd43b;color:#5c4400}
+.scope-wrap{max-width:1000px;margin:14px auto 0;padding:0 20px}
+.scope{display:none;align-items:center;flex-wrap:wrap;gap:10px;background:#fff;border:1px solid #eef1f6;border-radius:16px;padding:10px 14px;font-weight:700;color:#495057}
+.select{padding:8px 12px;border-radius:12px;border:1.5px solid #dfe5ee;font-family:inherit;font-size:15px;font-weight:700;background:#fff;color:#1f2937}
+
+/* ----- 본문 공통 ----- */
+main{max-width:1000px;margin:20px auto;padding:0 20px 48px}
+.card{background:#fff;border-radius:24px;padding:26px;box-shadow:0 12px 32px rgba(31,41,55,.07);border:1px solid #eef1f6}
+.head-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;width:100%}
+.screen-head{margin-bottom:18px}
+.screen-head h2{margin:0 0 4px;font-size:22px;font-weight:800}
+.screen-head p{margin:0;color:#6b7280;font-size:15px}
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.stage .screen-head{margin-bottom:0}
+.count{font-size:14px;color:#868e96;font-weight:600;margin:0}
+.progress{width:100%;max-width:420px;height:8px;background:#e9ecef;border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,#4dabf7,#339af0);border-radius:99px;transition:width .3s}
+.hint{font-size:13px;color:#868e96;margin:6px 0 0}
+.sub{font-size:16px;font-weight:800;margin:22px 0 10px}
+.banner{padding:12px 16px;border-radius:14px;background:#fff9db;color:#7c5a00;font-weight:700;margin-bottom:16px;text-align:center}
+.banner.win{background:#ebfbee;color:#2b8a3e}
+
+/* ----- 버튼 ----- */
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:12px;padding:11px 18px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .12s,box-shadow .12s;white-space:nowrap;text-decoration:none}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.6;cursor:default;transform:none;box-shadow:none}
+.btn.sm{padding:8px 13px;font-size:14px;border-radius:10px}
+.btn-primary{background:#339af0;color:#fff}
+.btn-accent{background:#ff922b;color:#fff}
+.btn-success{background:#40c057;color:#fff}
+.btn-ghost{background:#f1f3f5;color:#343a40}
+.btn-danger{background:#fff5f5;color:#e03131}
+.big-toggle{background:#e7f5ff;color:#1c7ed6}
+.toolbar,.nav-row,.stats{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.nav-row{justify-content:center}
+.stats{font-size:15px;font-weight:600;color:#495057}
+.info{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.info .screen-head{margin-bottom:0}
+
+/* ----- 화면 프레임 ----- */
+.frame{width:100%;max-width:440px;min-height:300px;border-radius:20px;background:linear-gradient(160deg,#ffffff,#f0f7ff);border:1px solid #dbe7f5;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:16px}
+.frame img{max-width:100%;max-height:320px;object-fit:contain;border-radius:12px}
+.vid{width:100%;max-width:560px;aspect-ratio:16/9;height:auto;border:0;border-radius:12px;background:#000}
+.emo{font-size:130px;line-height:1}
+.word{font-size:34px;font-weight:800;color:#e8590c;min-height:46px;margin:0}
+.hidden-word{color:#d0d7e2}
+.countdown{font-size:160px;font-weight:800;color:#339af0;line-height:1}
+.quiz-q{font-size:18px;font-weight:700;color:#495057;margin:0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:520px}
+.opt{padding:16px;font-size:19px;font-weight:700;border:2px solid #e3e8ef;background:#fff;border-radius:16px;cursor:pointer;font-family:inherit;color:#343a40;transition:.15s}
+.opt:hover{border-color:#74c0fc;transform:translateY(-1px)}
+.opt.right{background:#ebfbee;border-color:#40c057;color:#2b8a3e}
+.opt.wrong{background:#fff5f5;border-color:#ff6b6b;color:#c92a2a}
+.feedback{min-height:28px;font-weight:700;font-size:18px;margin:0}
+.big-score{font-size:40px;font-weight:800;color:#1c7ed6;margin:0}
+.endicon{font-size:64px;line-height:1}
+.save-box{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;width:100%;max-width:460px}
+.save-box .input{flex:1;min-width:180px}
+
+/* ----- 짝맞추기 ----- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;width:100%}
+.tile{aspect-ratio:1;border-radius:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:linear-gradient(145deg,#74c0fc,#4dabf7);color:#fff;font-size:34px;font-weight:800;overflow:hidden;transition:transform .15s;box-shadow:0 4px 10px rgba(77,171,247,.25);user-select:none;padding:4px}
+.tile:hover{transform:translateY(-2px)}
+.tile.open{background:#fff;border:2px solid #74c0fc;box-shadow:none}
+.tile.done{background:#ebfbee;border:2px solid #69db7c;box-shadow:none;opacity:.85}
+.tile img{width:100%;height:100%;object-fit:cover;border-radius:14px}
+.tile .emo{font-size:52px}
+.tile .w{font-size:16px;color:#1f2937;word-break:keep-all;line-height:1.3}
+
+/* ----- 점수 기록 ----- */
+.stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.stat{flex:1;min-width:150px;background:#f1f8ff;border-radius:16px;padding:14px;text-align:center;display:flex;flex-direction:column;gap:4px}
+.stat span{font-size:14px;color:#495057;font-weight:600}
+.stat b{font-size:26px;color:#1c7ed6}
+.table-wrap{overflow-x:auto;border:1px solid #eef1f6;border-radius:16px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:11px 12px;border-bottom:1px solid #eef1f6;text-align:left;white-space:nowrap}
+th{background:#f8fafc;color:#495057;font-weight:700}
+tr:last-child td{border-bottom:0}
+
+/* ----- 문제 만들기 ----- */
+.edit-list{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+.item{display:grid;grid-template-columns:76px 1fr auto;gap:14px;align-items:center;padding:14px;border:1px solid #eef1f6;border-radius:18px;background:#fff}
+.thumb{width:76px;height:76px;border-radius:14px;background:#f1f3f5;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb .emo{font-size:38px}
+.badge{position:absolute;right:3px;bottom:3px;background:#fff;border-radius:8px;font-size:12px;padding:1px 4px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.fields{display:grid;grid-template-columns:1fr 130px;gap:8px}
+.fields .wide{grid-column:1/-1}
+.item-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.input{width:100%;padding:10px 12px;border:1.5px solid #dfe5ee;border-radius:12px;font-family:inherit;font-size:15px;background:#fbfcfe;color:#1f2937}
+.input:focus{outline:none;border-color:#74c0fc;background:#fff;box-shadow:0 0 0 3px rgba(116,192,252,.2)}
+.bulk{margin-top:18px;padding:20px;border-radius:20px;background:#fff8ec;border:1px solid #ffe3b8}
+.bulk h3{margin:0 0 6px;font-size:17px;font-weight:800}
+.bulk ol{margin:0 0 12px;padding-left:20px;color:#495057;font-size:14px;line-height:1.7}
+.bulk textarea{width:100%;min-height:190px;padding:14px;border:1.5px solid #ffd8a8;border-radius:14px;font-family:inherit;font-size:15px;line-height:1.6;background:#fff;resize:vertical}
+.bulk textarea:focus{outline:none;border-color:#ff922b}
+.bulk-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
+.bulk-foot label{font-size:14px;color:#495057;display:flex;align-items:center;gap:6px;cursor:pointer}
+.bulk-count{font-weight:700;color:#e8590c;font-size:15px}
+.example{font-size:13px;color:#6b7280;background:#fff;border-radius:10px;padding:8px 12px;margin:10px 0 0;font-family:inherit;white-space:pre-line}
+
+.empty{text-align:center;padding:48px 20px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.empty p{font-size:20px;font-weight:700;margin:0}
+
+/* ----- 사용설명서 ----- */
+.modal{position:fixed;inset:0;background:rgba(17,24,39,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:#fff;border-radius:24px;max-width:860px;width:100%;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid #eef1f6}
+.modal-head h2{margin:0;font-size:20px;font-weight:800}
+.guide-body{overflow:auto;padding:18px 22px 26px}
+.g-sec{margin-bottom:24px}
+.g-sec h3{margin:0 0 10px;font-size:17px;font-weight:800;color:#1c7ed6}
+.g-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.g-step{background:#f8fafc;border:1px solid #eef1f6;border-radius:18px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.g-ico{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;background:#e7f5ff}
+.g-step b{display:block;font-size:15px;margin-bottom:4px}
+.g-step p{margin:0;font-size:14px;color:#495057;line-height:1.55}
+.g-step code{background:#fff;border:1px solid #dfe5ee;border-radius:6px;padding:1px 6px;font-size:13px}
+.g-tip{background:#fff9db;border-radius:14px;padding:12px 14px;font-size:14px;color:#7c5a00;margin-top:12px;line-height:1.6}
+.credit{position:fixed;right:12px;bottom:8px;font-size:11px;color:#adb5bd;pointer-events:none;z-index:1}
+
+/* ----- 5초 생각하기 숫자 (그림 위 상단에 표시) ----- */
+.frame{position:relative}
+.cd-badge{position:absolute;top:14px;right:14px;left:auto;transform:none;z-index:2;width:84px;height:84px;border-radius:50%;background:#339af0;color:#fff;font-size:44px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(51,154,240,.4)}
+body.bigmode .cd-badge{width:110px;height:110px;font-size:60px;top:16px;right:16px}
+
+/* ----- 큰 화면 모드 (각 게임 화면의  큰 화면 버튼) ----- */
+body.bigmode .top,
+body.bigmode .scope-wrap{display:none}
+body.bigmode main{max-width:1500px;margin:12px auto;padding:0 24px}
+body.bigmode .card{padding:28px}
+body.bigmode .screen-head h2{font-size:30px}
+body.bigmode .screen-head p{font-size:20px}
+body.bigmode .frame{max-width:none;min-height:62vh}
+body.bigmode .frame img{max-height:60vh}
+body.bigmode .frame .emo{font-size:min(38vh,320px)}
+body.bigmode .vid{max-width:1100px}
+body.bigmode .word{font-size:clamp(56px,8vw,120px);min-height:1.2em}
+body.bigmode .countdown{font-size:clamp(160px,40vh,360px)}
+body.bigmode .quiz-q{font-size:28px}
+body.bigmode .opts{max-width:900px}
+body.bigmode .opt{font-size:30px;padding:24px}
+body.bigmode .grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+body.bigmode .tile{font-size:44px}
+body.bigmode .tile .emo{font-size:72px}
+body.bigmode .tile .w{font-size:22px}
+body.bigmode .count{font-size:20px}
+body.bigmode .progress{max-width:900px;height:12px}
+body.bigmode .banner{font-size:22px}
+body.bigmode .stats{font-size:20px}
+body.bigmode .feedback{font-size:26px}
+body.bigmode .big-score{font-size:72px}
+body.bigmode .btn{font-size:20px;padding:16px 26px;border-radius:16px}
+body.bigmode .btn.sm{font-size:17px;padding:12px 18px}
+
+/* 큰 화면: 모든 내용이 한 화면 안에 들어가도록 높이를 화면에 맞춤 */
+body.bigmode .credit{display:none}
+body.bigmode main{max-width:1500px;margin:0 auto;padding:12px 20px;height:100vh;display:flex;flex-direction:column}
+body.bigmode main > .card{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:16px 24px;overflow:hidden;margin:0}
+body.bigmode .stage{gap:10px}
+body.bigmode .head-row{flex-wrap:nowrap}
+body.bigmode .screen-head{margin-bottom:0}
+body.bigmode .screen-head h2{font-size:24px;margin:0}
+body.bigmode .screen-head p{font-size:16px}
+body.bigmode .hint{display:none}
+body.bigmode .progress{max-width:700px;height:8px}
+body.bigmode .count{font-size:16px}
+body.bigmode .frame{flex:0 0 auto;min-height:0;height:46vh;max-height:46vh;max-width:none;padding:12px}
+body.bigmode .frame img{max-height:42vh}
+body.bigmode .frame .emo{font-size:min(28vh,220px)}
+body.bigmode .vid{width:auto;max-width:100%;height:42vh;max-height:42vh}
+body.bigmode .countdown{font-size:min(34vh,300px)}
+body.bigmode .word{font-size:clamp(40px,6vw,80px);min-height:0;line-height:1.2}
+body.bigmode .nav-row{gap:10px}
+body.bigmode .btn{font-size:17px;padding:12px 20px;border-radius:14px}
+body.bigmode .btn.sm{font-size:15px;padding:9px 14px}
+body.bigmode .quiz-q{font-size:22px}
+body.bigmode .opts{max-width:820px;gap:10px}
+body.bigmode .opt{font-size:24px;padding:14px}
+body.bigmode .feedback{font-size:22px;min-height:0}
+body.bigmode .grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;overflow:auto;max-height:68vh;padding:4px}
+body.bigmode .tile{font-size:26px}
+body.bigmode .tile .emo{font-size:52px}
+body.bigmode .tile .w{font-size:17px}
+body.bigmode .stats{font-size:17px}
+body.bigmode .banner{padding:8px 14px;font-size:18px;margin-bottom:8px}
+body.bigmode .big-score{font-size:52px}
+
+@media (max-width:620px){
+  .g-steps{grid-template-columns:1fr}
+  .brand p{display:none}
+  .tab{padding:7px 9px;font-size:14px}
+  .item{grid-template-columns:64px 1fr}
+  .thumb{width:64px;height:64px}
+  .item > .btn-danger{grid-column:1/-1;justify-self:end}
+  .fields{grid-template-columns:1fr}
+  .opts{grid-template-columns:1fr}
+  .emo{font-size:96px}
+  .card{padding:18px}
+}
+
+/* ===== 꾸미기 (헤더 · 탭 · 전체 분위기) ===== */
+body{background-color:#fff7fb;background-image:
+  radial-gradient(circle at 0% 0%,#ffe3ec 0,transparent 40%),
+  radial-gradient(circle at 100% 0%,#e0f2ff 0,transparent 40%),
+  radial-gradient(circle at 50% 100%,#fff3bf 0,transparent 45%)}
+.top{background:rgba(255,255,255,.85);border-bottom:none;box-shadow:0 4px 18px rgba(255,140,170,.12)}
+.top-inner{padding:14px 20px}
+.brand{background:linear-gradient(135deg,#ff8fab 0%,#ffa94d 50%,#74c0fc 100%);padding:7px 20px 7px 8px;border-radius:999px;box-shadow:0 8px 20px rgba(255,143,171,.4);transform:rotate(-1deg);transition:transform .2s}
+.brand:hover{transform:rotate(0deg) scale(1.03)}
+.logo{width:50px;height:50px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 3px 8px rgba(0,0,0,.12);flex-shrink:0}
+.brand h1{color:#fff;font-size:22px;font-weight:900;letter-spacing:-.2px;text-shadow:0 2px 0 rgba(0,0,0,.12)}
+.brand p{color:#fff;opacity:.92;font-weight:600}
+.tabs{background:#fff;border:2px solid #ffe0ea;padding:5px;border-radius:999px;gap:6px;box-shadow:0 4px 12px rgba(255,143,171,.15)}
+.tab{border-radius:999px;padding:9px 16px;color:#5c6b80;transition:transform .15s,background .15s}
+.tab:hover{background:#fff0f6;transform:translateY(-1px)}
+.tab.on{background:linear-gradient(135deg,#74c0fc,#4dabf7);color:#fff;box-shadow:0 4px 12px rgba(77,171,247,.45)}
+.guide-btn{background:linear-gradient(135deg,#ffd43b,#ffa94d);color:#5c3a00;border-radius:999px;box-shadow:0 4px 12px rgba(255,169,77,.4);padding:10px 18px}
+.guide-btn:hover{transform:translateY(-2px) rotate(-1deg)}
+.top-inner .guide-btn{white-space:nowrap}
+body.bigmode .brand,body.bigmode .tabs{display:none}
+@media (max-width:620px){
+  .top-inner{padding:10px 14px;gap:10px}
+  .brand{padding:5px 14px 5px 5px}
+  .logo{width:42px;height:42px;font-size:22px}
+  .brand h1{font-size:18px}
+  .tab{padding:7px 10px}
+}
+
+/* ===== 정답 표시: 버튼 모양, 글씨 크기 절반 ===== */
+.word{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:6px auto 2px;padding:10px 30px;min-height:0;font-size:17px;font-weight:800;line-height:1.2;color:#fff;background:linear-gradient(135deg,#ff8fab,#ffa94d);border-radius:999px;box-shadow:0 6px 16px rgba(255,143,171,.4);letter-spacing:.5px;animation:popIn .3s ease}
+.word::before{content:"";font-size:15px}
+.word::after{content:"";font-size:15px}
+.hidden-word{background:#fff;color:#adb5bd;border:2px dashed #ffc9d9;box-shadow:none;animation:none}
+.hidden-word::before,.hidden-word::after{content:none}
+.word:not(.hidden-word){display:flex;width:max-content;max-width:90%}
+@keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+body.bigmode .word{font-size:clamp(20px,2.6vw,34px);min-height:0;padding:12px 36px}
+
+/* ===== 퀴즈 화면 안 최근 점수 상자 ===== */
+.rec-box{margin-top:18px;background:#fffbea;border:2px solid #ffe69c;border-radius:16px;padding:12px 16px;text-align:left}
+.rec-box summary{cursor:pointer;font-weight:800;color:#8a5a00;font-size:15px}
+.rec-box table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+.rec-box th,.rec-box td{padding:6px 8px;border-bottom:1px solid #ffeeb3;text-align:center}
+.rec-box th{color:#8a5a00}
+body.bigmode .rec-box{display:none}
+
+/* ===== 사용설명서: 접었다 펴는 예시 상자 ===== */
+.ex-box{margin-top:14px;background:#f4f9ff;border:2px solid #d0ebff;border-radius:16px;padding:12px 16px}
+.ex-box summary{cursor:pointer;font-weight:800;color:#1864ab;font-size:15px}
+.ex-title{font-weight:800;margin:14px 0 6px;font-size:14px;color:#343a40}
+.ex-note{font-size:13px;color:#6b7280;margin:8px 0}
+.ex-table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border-radius:10px;overflow:hidden}
+.ex-table th,.ex-table td{padding:7px 8px;border-bottom:1px solid #eef2f7;text-align:center}
+.ex-table th{background:#e7f5ff;color:#1864ab}
+
+/* ===== 짝맞추기 쌍 수 선택 ===== */
+.pair-pick{display:inline-flex;background:#eef2f7;border-radius:999px;padding:3px;gap:2px}
+.pair-btn{border:0;background:none;padding:6px 14px;border-radius:999px;font-family:inherit;font-size:14px;font-weight:800;color:#5c6b80;cursor:pointer}
+.pair-btn.on{background:linear-gradient(135deg,#ffa94d,#ff8fab);color:#fff;box-shadow:0 3px 8px rgba(255,143,171,.4)}
+
+/* ===== 짝맞추기 전체 화면 배치 ===== */
+main:has(.match-stage){max-width:1400px}
+.match-grid{grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--rows),1fr);height:calc(100vh - 290px);min-height:400px;gap:16px;max-height:none;overflow:visible}
+.match-grid .tile{aspect-ratio:auto;height:100%;min-height:0}
+.match-grid .tile .w{font-size:clamp(18px,2.4vw,32px)}
+.match-grid .tile .emo{font-size:clamp(40px,6vh,84px)}
+body.bigmode .match-grid{grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(var(--rows),1fr);height:calc(100vh - 230px);min-height:300px;gap:14px;max-height:none;overflow:visible;padding:0}
+body.bigmode .match-grid .tile{font-size:clamp(20px,2.6vw,40px)}
+body.bigmode .match-grid .tile .w{font-size:clamp(18px,2.4vw,34px)}
+body.bigmode .match-grid .tile .emo{font-size:clamp(40px,6vh,84px)}
+@media (max-width:620px){
+  .match-grid{height:auto;min-height:0;grid-template-rows:none;grid-auto-rows:minmax(110px,1fr)}
+  .match-grid .tile{aspect-ratio:auto;height:auto;min-height:110px}
+}
+/* 짝맞추기 카드 영역: 화면 높이의 80% 이내 */
+.match-grid{height:min(calc(100vh - 290px),80vh)}
+body.bigmode .match-grid{height:min(calc(100vh - 230px),80vh)}
+@media (max-width:620px){.match-grid{height:auto}}
+/* 짝맞추기: 카드 영역을 정해진 상자 안에 가운데 맞춤 (카드가 정사각형에 가깝게) */
+.match-grid{margin:0 auto;width:min(100%, calc(min(calc(100vh - 290px), 80vh) * var(--cols) / var(--rows)))}
+body.bigmode .match-grid{width:min(100%, calc(min(calc(100vh - 230px), 80vh) * var(--cols) / var(--rows)))}
+@media (max-width:620px){.match-grid{width:100%}}
+/* 짝맞추기 칸 안 글씨·이모지: 칸 크기에 맞춰 자동으로 줄어듦 (잘림 방지) */
+.match-grid .tile{container-type:size}
+.match-grid .tile .w,
+body.bigmode .match-grid .tile .w{font-size:min(15cqw,18cqh);line-height:1.2;padding:0 8px;text-align:center;word-break:keep-all;overflow-wrap:anywhere}
+.match-grid .tile .emo,
+body.bigmode .match-grid .tile .emo{font-size:min(50cqw,50cqh)}
+
+/* ===== O,X 퀴즈 · 선 긋기 퀴즈 ===== */
+.ox-row{display:flex;gap:28px;justify-content:center;margin:6px 0}
+.ox-btn{width:112px;height:112px;border-radius:50%;border:0;font-size:56px;font-weight:900;cursor:pointer;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.15);transition:transform .12s;font-family:inherit}
+.ox-btn:hover{transform:translateY(-3px)}
+.ox-btn:disabled{cursor:default}
+.ox-o{background:linear-gradient(135deg,#69db7c,#40c057)}
+.ox-x{background:linear-gradient(135deg,#ffa8a8,#fa5252)}
+.ox-btn.right{outline:5px solid #2b8a3e;outline-offset:4px}
+.ox-btn.wrong{outline:5px solid #c92a2a;outline-offset:4px;opacity:.7}
+.ox-word{color:#e8590c}
+body.bigmode .ox-btn{width:150px;height:150px;font-size:70px}
+
+.line-board{position:relative;display:grid;grid-template-columns:1fr 1fr;column-gap:clamp(60px,16vw,200px);align-items:start;padding:8px 0}
+.line-col{display:flex;flex-direction:column;gap:14px}
+.line-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.line-item{height:clamp(66px,12vh,104px);width:100%;border-radius:18px;border:2px solid #d0ebff;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;font-size:20px;font-weight:800;color:#1f2937;box-shadow:0 4px 10px rgba(77,171,247,.15);padding:6px;transition:transform .12s}
+.line-item:hover{transform:translateY(-2px)}
+.line-item img{height:100%;width:auto;max-width:100%;object-fit:contain;border-radius:12px}
+.line-item .emo{font-size:44px}
+.line-item .w{word-break:keep-all}
+.line-item.sel{border-color:#ff922b;box-shadow:0 0 0 4px #ffe8cc}
+.line-item.ok{border-color:#40c057;background:#ebfbee}
+.line-item.ng{border-color:#ff6b6b;background:#fff5f5}
+@media (max-width:620px){.line-board{column-gap:36px}.line-item{font-size:16px}}
+
+/* 선 긋기: 영상 문제 칸 · 영상 팝업 */
+.lv-box{display:flex;flex-direction:column;align-items:center;gap:6px}
+.lv-ico{font-size:34px}
+.lv-btn{display:inline-block;border-radius:999px;padding:6px 12px;background:#ff8fab;color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.vid-pop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+.vid-box{background:#fff;border-radius:20px;padding:16px;width:min(900px,100%);max-height:90vh;overflow:auto}
+.vid-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:20px}
+.vid-box .vid{width:100%;height:min(60vh,480px);border:0;border-radius:14px;background:#000}
+
+/* 영상 문제 칸 미리보기 (클릭은 칸이 받음) */
+.thumb-vid{width:100%;height:100%;object-fit:cover;border-radius:14px;pointer-events:none;background:#000;border:0}
+.tile .thumb-vid{position:absolute;inset:0}
+.tile{position:relative}
+/* 사진이 없는 문제 글씨 · 상태 칩 */
+.noimg{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:40px;padding:6px;text-align:center;word-break:keep-all;font-size:16px;font-weight:800;color:#495057;background:#f1f3f5;border-radius:14px}
+.thumb .noimg{font-size:12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.chip{font-size:13px;font-weight:800;padding:4px 10px;border-radius:999px}
+.chip.ok{background:#ebfbee;color:#2b8a3e}
+.chip.no{background:#f1f3f5;color:#868e96}
+
+/* 선 긋기: 네모칸 안 영상 재생 */
+.line-item.isvid{height:auto;flex-direction:column;gap:6px;padding:8px}
+.line-vid{width:100%;height:clamp(120px,20vh,170px);border:0;border-radius:12px;background:#000;display:block}
+.pick-bar{width:100%;text-align:center;font-size:13px;font-weight:800;color:#1864ab;background:#e7f5ff;border-radius:8px;padding:5px 0}
+
+/* 선 긋기 (PC 기준): 한 줄에 왼쪽·오른쪽 상자, 오른쪽 상자는 왼쪽 높이에 맞춤 */
+.line-board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:clamp(120px,22vw,300px);row-gap:14px;align-items:stretch;max-width:860px;margin:0 auto;padding:4px 0}
+.line-board .line-item.lt{height:clamp(96px,15vh,132px)}
+.line-board .line-item.lt.isvid{height:auto}
+.line-board .line-vid{height:clamp(110px,14vh,132px)}
+.line-board .line-item.rt{height:auto;min-height:72px}
+
+.range-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      
+      <div>
+        <h1>수어 학습 놀이터</h1>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab on" data-v="study" onclick="go('study')">학습카드</button>
+      <button class="tab" data-v="match" onclick="go('match')">짝맞추기</button>
+      <button class="tab" data-v="quiz" onclick="go('quiz')">단어 퀴즈</button>
+      <button class="tab" data-v="ox" onclick="go('ox')">O,X 퀴즈</button>
+      <button class="tab" data-v="line" onclick="go('line')">선 긋기</button>
+      <button class="tab" data-v="scores" onclick="go('scores')">점수 기록</button>
+      <button class="tab" data-v="edit" onclick="go('edit')">✏ 문제 만들기</button>
+    </nav>
+    <button class="btn guide-btn sm" onclick="openGuide()">사용설명서</button>
+  </div>
+</header>
+
+<div class="scope-wrap"><div id="scope" class="scope"></div></div>
+<main id="main"></main>
+
+<div id="guide" class="modal" onclick="if(event.target===this) closeGuide()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>사용설명서</h2>
+      <button class="btn btn-ghost sm" onclick="closeGuide()">닫기 ✕</button>
+    </div>
+    <div class="guide-body">
+
+      <section class="g-sec">
+        <h3>① 화면 소개 (위쪽 메뉴)</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>학습카드</b><p>그림이나 영상을 보고 단어를 떠올립니다. "정답 보기"로 단어를 확인하고, "5초 생각하기"로 먼저 생각할 시간을 줄 수 있어요.</p></div></div>
+          <div class="g-step"><div><b>짝맞추기</b><p>처음 미리보기 시간 동안 카드 위치를 외운 뒤, 같은 그림과 단어의 짝을 찾습니다. 화면 위의 <b>2쌍 · 4쌍 · 8쌍</b> 버튼으로 카드 수를 고를 수 있어요. 미리보기는 2쌍 2초, 4쌍 3초, 8쌍 5초입니다.</p></div></div>
+          <div class="g-step"><div><b>단어 퀴즈</b><p>그림을 보고 4개 중 맞는 단어를 고릅니다. 끝나면 이름을 적고 점수를 저장할 수 있어요.</p></div></div>
+          <div class="g-step"><div><b>점수 기록</b><p>학생별 평균과 최근 기록을 봅니다. 엑셀(CSV) 파일로 받을 수도 있어요.</p></div></div>
+          <div class="g-step"><span class="g-ico">✏</span><div><b>문제 만들기</b><p>단어, 그림, 영상을 넣고 고치는 곳입니다.</p></div></div>
+        </div>
+      </section>
+
+      <section class="g-sec">
+        <h3>② 수업 범위 고르기 ( 단원)</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>단원 선택</b><p>학습카드, 짝맞추기, 퀴즈 화면 위쪽의 <b>수업 범위</b>에서 단원을 고르면 그 단원의 문제만 나와요. 기본은 "전체"입니다.</p></div></div>
+        </div>
+      </section>
+
+      <section class="g-sec">
+        <h3>③ 문제 만들기 (3가지 방법)</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>한 문제씩</b><p>"＋ 한 문제 추가"를 누르고 칸에 단어, 단원, 영상 링크를 적습니다. 사진은 아래 문제 칸에서 올립니다.</p></div></div>
+          <div class="g-step"><div><b>한꺼번에 입력</b><p>한 줄에 한 문제씩 적습니다.<br><code>안녕하세요, , , 1과</code><br>구글 시트나 엑셀에서 복사해 붙여넣어도 됩니다.</p></div></div>
+          <div class="g-step"><div><b>사진·영상 한꺼번에</b><p>파일 이름을 단어와 똑같이 바꾼 뒤 여러 개를 한 번에 고릅니다.<br><code>안녕하세요.jpg</code> <code>사랑해요.mp4</code></p></div></div>
+        </div>
+        <div class="g-tip">추천 순서: ① 한꺼번에 입력으로 단어와 단원을 먼저 넣기 → ②  사진·영상 한꺼번에로 그림과 영상 연결하기 → ③ 필요한 것만 고치기</div>
+      </section>
+
+      <section class="g-sec">
+        <h3>④ 영상 넣기</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>영상 링크</b><p>유튜브 주소를 "영상 링크" 칸에 붙여넣습니다.</p></div></div>
+          <div class="g-step"><div><b>영상 파일</b><p>" 영상 파일 올리기"로 컴퓨터의 영상을 고릅니다. 60MB 이하만 가능해요.</p></div></div>
+        </div>
+      </section>
+
+      <section class="g-sec">
+        <h3>⑤ 저장과 백업</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>자동 저장</b><p>문제와 점수는 이 컴퓨터의 브라우저에 자동으로 저장됩니다.</p></div></div>
+          <div class="g-step"><div><b>백업</b><p>" 백업 저장"으로 파일을 받아 두면 다른 컴퓨터에서 " 백업 불러오기"로 가져올 수 있어요.</p></div></div>
+        </div>
+        <div class="g-tip">백업 파일에는 글과 사진, 영상 링크가 들어갑니다. 영상 파일은 빠지니 다시 올려 주세요. 점수 기록은 엑셀(CSV)로 따로 받아 두는 것이 안전합니다.</div>
+      </section>
+
+      <section class="g-sec">
+        <h3>⑥ 큰 화면으로 보기</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>큰 화면 버튼</b><p>학습카드, 짝맞추기, 단어 퀴즈 화면마다 있습니다. 누르면 화면이 전체 화면으로 커집니다.</p></div></div>
+          <div class="g-step"><span class="g-ico">✕</span><div><b>끄기</b><p>"✕ 큰 화면 끄기" 버튼이나 Esc 키를 누르면 원래 화면으로 돌아갑니다.</p></div></div>
+          <div class="g-step"><div><b>← → / 스페이스</b><p>학습카드에서 화살표로 넘기고, 스페이스로 정답을 보이거나 가립니다.</p></div></div>
+        </div>
+      </section>
+
+      <section class="g-sec">
+        <h3>⑦ 학습카드 사용 순서</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>1. 그림·영상 보기</b><p>그림이나 영상을 보고 단어를 떠올려 봅니다.</p></div></div>
+          <div class="g-step"><div><b>2. 5초 생각하기</b><p>버튼을 누르면 그림 위에 숫자 5, 4, 3, 2, 1이 나옵니다. 그림과 영상은 그대로 보입니다.</p></div></div>
+          <div class="g-step"><div><b>3. 정답 나오기</b><p>숫자가 0이 되면 단어가 자동으로 나옵니다.</p></div></div>
+          <div class="g-step"><div><b>4. 가리기</b><p>"다시 가리기" 버튼이나 스페이스 키로 정답을 다시 숨길 수 있어요.</p></div></div>
+          <div class="g-step"><span class="g-ico">▶</span><div><b>5. 다음 문제</b><p>"다음 ▶"을 누르면 다음 그림으로 넘어갑니다. ← → 키로도 넘길 수 있어요.</p></div></div>
+        </div>
+        <div class="g-tip">"정답 보기"를 누르면 바로 단어가 나오고, 다시 누르면 가려집니다.</div>
+      </section>
+
+      <section class="g-sec">
+        <h3>⑧ 점수 기록 사용법</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>1. 단어 퀴즈 풀기</b><p>그림을 보고 보기 4개 중 알맞은 단어를 고릅니다. 맞히면 점수가 1점 올라가요.</p></div></div>
+          <div class="g-step"><span class="g-ico">✍</span><div><b>2. 이름 적기</b><p>퀴즈가 끝나면 학생 이름을 적어 주세요. 비워 두면 "이름 없음"으로 저장됩니다.</p></div></div>
+          <div class="g-step"><div><b>3. 점수 저장</b><p>" 점수 저장"을 누르면 기록에 남습니다. 저장 후에는 " 저장됨"으로 바뀝니다.</p></div></div>
+          <div class="g-step"><div><b>4. 기록 보기</b><p>단어 퀴즈 화면 아래의 " 최근 점수 보기"에서 최근 5건을 바로 볼 수 있어요. 전체는 메뉴의 " 점수 기록"에서 봅니다.</p></div></div>
+          <div class="g-step"><div><b>5. 엑셀로 받기</b><p>점수 기록 화면의 " 엑셀(CSV) 받기"를 누르면 파일로 저장되어 엑셀에서 열 수 있어요.</p></div></div>
+        </div>
+        <div class="g-tip">점수는 <b>단어 퀴즈 · O,X 퀴즈 · 선 긋기 퀴즈</b>에서 저장됩니다. 학습카드와 짝맞추기는 점수가 남지 않아요.</div>
+        <div class="g-tip">점수 기록 화면 위의 <b>단원 칸</b>에서 "전체" 또는 단원 이름을 골라 보면, 그 단원의 기록만 따로 볼 수 있어요.</div>
+        <div class="g-tip"><b>전체 엑셀 받기</b>는 모든 기록을, <b>단원별 엑셀 받기</b>는 단원 칸에서 고른 단원의 기록만 파일로 받습니다. 파일 이름에 단원 이름이 들어가요.</div>
+        <div class="g-tip">점수는 <b>지금 쓰는 컴퓨터(브라우저)에만</b> 저장됩니다. 다른 컴퓨터에서는 보이지 않으니 중요한 기록은 엑셀로 받아 두세요. 기록은 줄별로 삭제할 수 있고, "전체 지우기"는 되돌릴 수 없어요.</div>
+
+        <details class="ex-box">
+          <summary> 점수 기록 예시 화면 보기 (4명이 여러 번 푼 경우)</summary>
+          <p class="ex-note">한 번 저장할 때마다 최근 기록에 한 줄씩 쌓입니다. 학생별 평균은 같은 이름끼리 묶여서 계산돼요.</p>
+          <p class="ex-title">상단 요약</p>
+          <table class="ex-table">
+            <tr><th>저장된 기록</th><th>평균 정답률</th><th>학생 수</th></tr>
+            <tr><td>8</td><td>76%</td><td>4</td></tr>
+          </table>
+          <p class="ex-title">학생별 평균</p>
+          <table class="ex-table">
+            <tr><th>이름</th><th>횟수</th><th>평균 정답률</th></tr>
+            <tr><td>김민수</td><td>2회</td><td>75%</td></tr>
+            <tr><td>박지훈</td><td>1회</td><td>90%</td></tr>
+            <tr><td>이서연</td><td>3회</td><td>67%</td></tr>
+            <tr><td>최유나</td><td>2회</td><td>85%</td></tr>
+          </table>
+          <p class="ex-title">최근 기록 (최신순)</p>
+          <table class="ex-table">
+            <tr><th>날짜</th><th>이름</th><th>단원</th><th>종류</th><th>점수</th></tr>
+            <tr><td>10/29 11:35</td><td>이서연</td><td>전체</td><td>9 / 10</td></tr>
+            <tr><td>10/29 11:30</td><td>최유나</td><td>전체</td><td>7 / 10</td></tr>
+            <tr><td>10/29 11:25</td><td>이서연</td><td>전체</td><td>6 / 10</td></tr>
+            <tr><td>10/29 11:20</td><td>김민수</td><td>전체</td><td>8 / 10</td></tr>
+            <tr><td>10/29 11:15</td><td>최유나</td><td>전체</td><td>10 / 10</td></tr>
+            <tr><td>10/29 11:10</td><td>박지훈</td><td>1단원</td><td>9 / 10</td></tr>
+            <tr><td>10/29 11:05</td><td>이서연</td><td>전체</td><td>5 / 10</td></tr>
+            <tr><td>10/29 11:00</td><td>김민수</td><td>전체</td><td>7 / 10</td></tr>
+          </table>
+          <p class="ex-note">이서연 님은 3번 풀어서 최근 기록에 3줄이 남고, 학생별 평균에서는 "3회 · 67%"로 묶여 보입니다.</p>
+        </details>
+      </section>
+
+      <section class="g-sec">
+        <h3>⑨ O,X 퀴즈 · 선 긋기 퀴즈</h3>
+        <div class="g-steps">
+          <div class="g-step"><div><b>O,X 퀴즈</b><p>그림을 보고 화면에 나온 단어가 맞으면 , 틀리면 를 누릅니다. 한 번에 최대 10문제가 나와요.</p></div></div>
+          <div class="g-step"><div><b>선 긋기 퀴즈</b><p>왼쪽 그림을 누른 뒤 오른쪽 단어를 누르면 선이 이어집니다. 잘못 이었으면 이은 칸을 다시 누르면 지워져요.</p></div></div>
+          <div class="g-step"><div><b>채점하기</b><p>선 긋기는 다 이은 뒤 " 채점하기"를 누르세요. 맞은 선은 초록색, 틀린 선은 빨간색으로 보입니다.</p></div></div>
+          <div class="g-step"><div><b>점수 저장</b><p>끝난 뒤 " 점수 저장"을 누르면 기록에 남습니다. 점수 기록 표에서 "종류" 칸으로 어떤 퀴즈인지 구분할 수 있어요.</p></div></div>
+        </div>
+        <div class="g-tip">사진이나 영상이 있는 문제만 게임에 나옵니다. 선 긋기 퀴즈의 영상은 칸 안에서 바로 재생하고, 아래 '이 칸 선택'을 눌러 선을 잇습니다.</div>
+      </section>
+
+    </div>
+  </div>
+</div>
+<footer class="credit">created by yujin</footer>
+
+<script>
+const KEY = 'ksl-play-v1';
+const SCORE_KEY = 'ksl-scores-v1';
+const SAMPLE = [
+  {id:1, word:'안녕하세요', img:'', unit:'1과'},
+  {id:2, word:'감사합니다', img:'', unit:'1과'},
+  {id:3, word:'사랑해요', img:'', unit:'1과'},
+  {id:4, word:'학교', img:'', unit:'1과'},
+  {id:5, word:'친구', img:'', unit:'1과'},
+  {id:6, word:'가족', img:'', unit:'2과'},
+  {id:7, word:'물', img:'', unit:'2과'},
+  {id:8, word:'밥', img:'', unit:'2과'},
+  {id:9, word:'병원', img:'', unit:'2과'},
+  {id:10, word:'도서관', img:'', unit:'2과'}
+];
+
+let items = loadItems();
+let scores = loadScores();
+let current = 'study';   // 지금 보고 있는 화면
+let unit = '전체';         // 수업 범위(단원)
+let bigOn = false;        // 큰 화면 모드 여부
+const main = document.getElementById('main');
+let bulkOpen = false;
+let flash = '';
+
+// ---------- 공통 도구 ----------
+function loadItems(){
+  try{
+    const d = JSON.parse(localStorage.getItem(KEY));
+    if(Array.isArray(d)) return d;
+  }catch(e){}
+  return SAMPLE.map(x=>({...x}));
+}
+function save(){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(items));
+    return true;
+  }catch(e){
+    alert('저장 공간이 가득 찼어요. 사진 개수를 줄이거나 백업 후 정리해 주세요.');
+    return false;
+  }
+}
+function loadScores(){
+  try{
+    const d = JSON.parse(localStorage.getItem(SCORE_KEY));
+    if(Array.isArray(d)) return d;
+  }catch(e){}
+  return [];
+}
+function saveScores(){
+  try{ localStorage.setItem(SCORE_KEY, JSON.stringify(scores)); return true; }
+  catch(e){ alert('점수를 저장하지 못했어요. 저장 공간을 확인해 주세요.'); return false; }
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function pic(img, it){
+  if((img || '').startsWith('data:')) return `<img src="${img}" alt="">`;
+  // 사진이 없는 영상 문제: 유튜브 썸네일 또는 영상의 첫 장면을 칸에 보여 줌
+  if(it && it.videoUrl){
+    const id = ytId(it.videoUrl);
+    if(id) return `<img src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="">`;
+  }
+  if(it && it.hasVideo) return `<video class="thumb-vid" data-vid="${it.id}" muted preload="metadata" playsinline></video>`;
+  const t = (it && (it.hasVideo || it.videoUrl)) ? '▶ 영상' : (it ? it.word : '');
+  return `<span class="noimg">${esc(t)}</span>`;
+}
+// 짝맞추기 카드: 영상은 소리 없이 자동 반복 재생 (카드가 뒤집혀 보일 때만 그려짐)
+function matchPic(it){
+  if((it.img || '').startsWith('data:')) return `<img src="${it.img}" alt="">`;
+  if(it.videoUrl){
+    const id = ytId(it.videoUrl);
+    if(id) return `<iframe class="thumb-vid" src="${ytEmbed(it, id, 'autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=0&playsinline=1')}" allow="autoplay; encrypted-media" tabindex="-1"></iframe>`;
+  }
+  if(it.hasVideo) return `<video class="thumb-vid" data-vid="${it.id}" autoplay muted loop playsinline></video>`;
+  return pic(it.img, it);
+}
+// 사진 또는 영상이 있는 문제만 게임에 사용
+function hasVisual(it){ return (it.img || '').startsWith('data:') || !!(it.hasVideo || it.videoUrl); }
+function unitOf(it){ return it.unit || '미분류'; }
+function pool(){
+  const base = unit === '전체' ? items : items.filter(i=>unitOf(i) === unit);
+  return base.filter(hasVisual);
+}
+function chipsHtml(it){
+  const photo = (it.img || '').startsWith('data:');
+  const vid = !!(it.hasVideo || it.videoUrl);
+  const vTxt = !vid ? '없음' : (it.hasVideo ? '파일 등록됨' : '링크 등록됨');
+  return `<div class="chips"><span class="chip ${photo ? 'ok' : 'no'}">사진 ${photo ? '등록됨' : '없음'}</span><span class="chip ${vid ? 'ok' : 'no'}">영상 ${vTxt}</span></div>`;
+}
+function nowStr(){
+  return new Date().toLocaleString('ko-KR', {year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+}
+function needMore(){
+  return `<section class="card empty">
+    
+    <p>사진이나 영상이 있는 문제가 이 범위에 2개 이상 필요해요</p>
+    <button class="btn btn-accent" onclick="go('edit')">✏ 문제 만들기로 가기</button>
+  </section>`;
+}
+
+//  큰 화면 버튼 (학습카드·짝맞추기·퀴즈 화면마다 넣습니다)
+function bigBtn(){
+  return `<button class="btn sm big-toggle" onclick="toggleBig()">${bigOn ? '✕ 큰 화면 끄기' : ' 큰 화면'}</button>`;
+}
+function toggleBig(){
+  if(bigOn){ exitBig(); return; }
+  bigOn = true;
+  document.body.classList.add('bigmode');
+  if(document.documentElement.requestFullscreen){
+    document.documentElement.requestFullscreen().catch(()=>{});
+  }
+  refreshBigBtn();
+}
+function exitBig(){
+  bigOn = false;
+  document.body.classList.remove('bigmode');
+  if(document.fullscreenElement && document.exitFullscreen){
+    document.exitFullscreen().catch(()=>{});
+  }
+  refreshBigBtn();
+}
+function refreshBigBtn(){
+  document.querySelectorAll('.big-toggle').forEach(b=>{
+    b.textContent = bigOn ? '✕ 큰 화면 끄기' : ' 큰 화면';
+  });
+}
+document.addEventListener('fullscreenchange', ()=>{
+  if(!document.fullscreenElement && bigOn) exitBig();
+});
+
+// 수업 범위(단원) 선택줄
+function renderScope(){
+  const el = document.getElementById('scope');
+  const show = ['study','match','quiz'].includes(current);
+  el.style.display = show ? 'flex' : 'none';
+  if(!show) return;
+  const list = [...new Set(items.map(unitOf))].sort();
+  if(unit !== '전체' && !list.includes(unit)) unit = '전체';
+  el.innerHTML = `<span>수업 범위</span>
+    <select class="select" onchange="setUnit(this.value)">
+      <option value="전체" ${unit==='전체'?'selected':''}>전체 (${items.length}문제)</option>
+      ${list.map(u=>`<option value="${esc(u)}" ${u===unit?'selected':''}>${esc(u)} (${items.filter(i=>unitOf(i)===u).length}문제)</option>`).join('')}
+    </select>
+    <span class="hint">단원을 고르면 그 단원의 문제만 나와요.</span>`;
+}
+function setUnit(v){ unit = v; go(current); }
+
+// ---------- 영상 도구 ----------
+// 영상 링크는 문제 데이터에 글로 저장하고, 영상 파일은 브라우저 저장소(IndexedDB)에 따로 보관합니다.
+// 영상 범위: 초 또는 0:10 형식 → 초
+function parseSec(v){
+  v = String(v == null ? '' : v).trim();
+  if(!v) return 0;
+  if(v.indexOf(':') >= 0){ const parts = v.split(':'); return Math.max(0, Math.floor((+parts[0] || 0) * 60 + (+parts[1] || 0))); }
+  return Math.max(0, Math.floor(+v) || 0);
+}
+// 유튜브 임베드 주소 (시작·끝 시간 포함)
+function ytEmbed(it, id, extra){
+  const q = extra ? extra.split('&') : [];
+  const st = it.vStart || 0, en = it.vEnd || 0;
+  if(st > 0) q.push('start=' + st);
+  if(en > 0 && en > st) q.push('end=' + en);
+  return 'https://www.youtube.com/embed/' + id + (q.length ? '?' + q.join('&') : '');
+}
+function ytId(url){
+  const m = String(url).match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+function media(it){
+  if(it.videoUrl){
+    const id = ytId(it.videoUrl);
+    if(id) return `<iframe class="vid" src="${ytEmbed(it, id)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+    return `<a class="btn btn-primary" href="${esc(it.videoUrl)}" target="_blank" rel="noopener"> 영상 열기</a>`;
+  }
+  if(it.hasVideo) return `<video class="vid" data-vid="${it.id}" controls playsinline></video>`;
+  return pic(it.img, it);
+}
+function openVDB(){
+  return new Promise((res, rej)=>{
+    const r = indexedDB.open('ksl-play-videos', 1);
+    r.onupgradeneeded = ()=> r.result.createObjectStore('v');
+    r.onsuccess = ()=> res(r.result);
+    r.onerror = ()=> rej(r.error);
+  });
+}
+async function vRun(mode, fn){
+  const db = await openVDB();
+  return new Promise((res, rej)=>{
+    const tx = db.transaction('v', mode);
+    const req = fn(tx.objectStore('v'));
+    tx.oncomplete = ()=>{ db.close(); res(req ? req.result : undefined); };
+    tx.onerror = ()=>{ db.close(); rej(tx.error); };
+  });
+}
+const putVideo = (id, blob)=> vRun('readwrite', s=>s.put(blob, String(id)));
+const getVideo = id => vRun('readonly', s=>s.get(String(id)));
+const delVideo = id => vRun('readwrite', s=>s.delete(String(id)));
+async function hydrate(){
+  const els = document.querySelectorAll('video[data-vid]');
+  for(const el of els){
+    try{
+      const blob = await getVideo(el.dataset.vid);
+      if(blob) el.src = URL.createObjectURL(blob);
+    }catch(e){}
+  }
+}
+
+// ---------- 화면 전환 ----------
+function go(v){
+  current = v;
+  closeLineVid();
+  stopS();
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
+  renderScope();
+  if(v==='study'){
+    if(!pool().length){ main.innerHTML = needMore(); return; }
+    sList = shuffle(pool()); sIdx = 0; sShow = false; viewStudy();
+  }
+  else if(v==='match') startMatch();
+  else if(v==='quiz') startQuiz();
+  else if(v==='ox') startOX();
+  else if(v==='line') startLine();
+  else if(v==='scores') viewScores();
+  else viewEdit();
+}
+
+// ---------- 1. 학습카드 ----------
+let sList = [], sIdx = 0, sShow = false, sCount = 0, sTimer = null;
+function stopS(){
+  if(sTimer){ clearInterval(sTimer); sTimer = null; }
+  sCount = 0;
+}
+function viewStudy(){
+  if(!sList.length){ main.innerHTML = needMore(); return; }
+  const it = sList[sIdx];
+  const pct = (sIdx+1) / sList.length * 100;
+  main.innerHTML = `<section class="card stage">
+    <div class="head-row">
+      <div class="screen-head"><h2>학습카드</h2><p>그림이나 영상을 보고 단어를 떠올려 보세요.</p></div>
+      ${bigBtn()}
+    </div>
+    <div class="progress"><span style="width:${pct}%"></span></div>
+    <p class="count">${sIdx+1} / ${sList.length}</p>
+    <div class="frame">${sCount > 0 ? `<div class="cd-badge" id="cdBadge">${sCount}</div>` : ''}${media(it)}</div>
+    <p class="word ${sShow?'':'hidden-word'}">${sShow ? esc(it.word) : '???'}</p>
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="moveS(-1)">◀ 이전</button>
+      <button class="btn btn-accent" onclick="toggleS()">${sShow ? '다시 가리기' : '정답 보기'}</button>
+      <button class="btn btn-success" onclick="thinkS()">5초 생각하기</button>
+      <button class="btn btn-ghost" onclick="moveS(1)">다음 ▶</button>
+    </div>
+    <button class="btn btn-ghost sm" onclick="reshuffleS()">순서 섞기</button>
+  </section>`;
+  hydrate();
+}
+function moveS(d){ stopS(); sIdx = (sIdx + d + sList.length) % sList.length; sShow = false; viewStudy(); }
+function toggleS(){ stopS(); sShow = !sShow; viewStudy(); }
+function reshuffleS(){ stopS(); sList = shuffle(pool()); sIdx = 0; sShow = false; viewStudy(); }
+function thinkS(){
+  stopS();
+  sCount = 5; sShow = false; viewStudy();
+  sTimer = setInterval(()=>{
+    sCount--;
+    if(sCount <= 0){ stopS(); sShow = true; viewStudy(); return; }
+    // 그림·영상은 그대로 두고 숫자만 바꿉니다 (영상이 다시 시작되지 않도록)
+    const b = document.getElementById('cdBadge');
+    if(b) b.textContent = sCount; else viewStudy();
+  }, 1000);
+}
+
+// ---------- 2. 짝맞추기 ----------
+let mCards = [], mFirst = null, mLock = false, mMoves = 0, mDone = 0, mPreview = false, mSec = 0, mGame = 0, mPairs = 8;
+function setPairs(n){ mPairs = n; startMatch(); }
+function startMatch(){
+  // 영상 문제도 그림(사진·이모지) 쪽 카드로 함께 사용
+  const p = pool();
+  if(p.length<2){ main.innerHTML = needMore(); return; }
+  const pick = shuffle(p).slice(0, Math.min(mPairs, p.length));
+  mCards = shuffle(pick.flatMap(it=>[
+    {key:it.id, kind:'img', it, open:true, done:false},
+    {key:it.id, kind:'word', it, open:true, done:false}
+  ]));
+  mFirst = null; mMoves = 0; mDone = 0;
+  mLock = true; mPreview = true;
+  mSec = mPairs === 2 ? 2 : mPairs === 4 ? 3 : 5; // 2쌍 2초, 4쌍 3초, 8쌍 5초
+  const g = ++mGame;
+  viewMatch();
+  // 처음 5초: 전체 카드를 보여준 뒤 뒤집기
+  const t = setInterval(()=>{
+    if(g !== mGame || current !== 'match'){ clearInterval(t); return; }
+    mSec--;
+    if(mSec <= 0){
+      clearInterval(t);
+      mCards.forEach(c=>c.open = false);
+      mPreview = false; mLock = false;
+      viewMatch();
+      return;
+    }
+    const bn = document.querySelector('.banner');
+    if(bn) bn.textContent = mSec + '초 동안 위치를 외우세요!';
+  }, 1000);
+}
+function viewMatch(){
+  const total = mCards.length / 2;
+  // 2쌍: 2열×2행, 4쌍: 4열×2행, 8쌍: 4열×4행
+  const cols = mPairs === 2 ? 2 : 4;
+  const rows = Math.ceil(mCards.length / cols);
+  const banner = mPreview
+    ? `<div class="banner">${mSec}초 동안 위치를 외우세요!</div>`
+    : (mDone===total && total>0 ? `<div class="banner win">모두 맞혔어요! (${mMoves}번 시도)</div>` : '');
+  main.innerHTML = `<section class="card match-stage">
+    <div class="info">
+      <div class="screen-head"><h2>짝맞추기</h2><p>같은 그림과 단어를 찾아 짝을 맞춰 보세요.</p></div>
+      <div class="stats">
+        <span>시도 <b>${mMoves}</b></span>
+        <span>맞춘 쌍 <b>${mDone} / ${total}</b></span>
+        <div class="pair-pick">${[2,4,8].map(n=>`<button class="pair-btn ${mPairs===n?'on':''}" onclick="setPairs(${n})">${n}쌍</button>`).join('')}</div>
+        <button class="btn btn-primary sm" onclick="startMatch()">다시하기</button>
+        ${bigBtn()}
+      </div>
+    </div>
+    ${banner}
+    <div class="grid match-grid" style="--cols:${cols};--rows:${rows}">${mCards.map((c,i)=>{
+      const shown = c.open || c.done;
+      const inner = shown
+        ? (c.kind==='img' ? matchPic(c.it) : `<span class="w">${esc(c.it.word)}</span>`)
+        : '<span>?</span>';
+      return `<div class="tile ${c.open?'open':''} ${c.done?'done':''}" onclick="flip(${i})">${inner}</div>`;
+    }).join('')}</div>
+  </section>`;
+  hydrate();   // 칸 안의 영상 불러오기
+}
+function flip(i){
+  const c = mCards[i];
+  if(mLock || c.open || c.done) return;
+  c.open = true;
+  if(mFirst === null){ mFirst = i; viewMatch(); return; }
+  mMoves++;
+  const f = mCards[mFirst];
+  if(f.key === c.key){
+    f.done = c.done = true; mDone++; mFirst = null; viewMatch();
+  }else{
+    mLock = true; viewMatch();
+    const g = mGame;
+    setTimeout(()=>{
+      if(g !== mGame || current !== 'match') return;
+      f.open = c.open = false; mFirst = null; mLock = false; viewMatch();
+    }, 900);
+  }
+}
+
+// ---------- 공통: 결과 화면 · 점수 저장 (O,X · 선 긋기 · 단어 퀴즈) ----------
+function resultHtml(title, score, total, again){
+  const msg = score / total >= 0.8 ? '아주 잘했어요! ' : '조금 더 연습해 볼까요? ';
+  return `<section class="card stage">
+    <div class="head-row">${bigBtn()}</div>
+    
+    <div class="screen-head"><h2>${title} 끝!</h2><p>${msg}</p></div>
+    <p class="big-score">${score} / ${total}</p>
+    <div class="save-box">
+      <input class="input" id="stuName" placeholder="학생 이름 (선택)" maxlength="20">
+      <button class="btn btn-success" id="saveBtn" onclick="saveResult('${title}',${score},${total})">점수 저장</button>
+    </div>
+    <button class="btn btn-primary" onclick="${again}">다시 풀기</button>
+    ${recentBox()}
+  </section>`;
+}
+function saveResult(kind, score, total){
+  const name = (document.getElementById('stuName').value || '').trim() || '이름 없음';
+  scores.push({ id: Date.now(), date: nowStr(), name: name, unit: unit, score: score, total: total, kind: kind });
+  if(!saveScores()) return;
+  const b = document.getElementById('saveBtn');
+  if(b){ b.disabled = true; b.textContent = ' 저장됨'; }
+}
+
+// ---------- O,X 퀴즈 ----------
+let oxList = [], oxIdx = 0, oxScore = 0, oxAns = false, oxCur = null;
+function startOX(){
+  const p = pool();
+  if(p.length < 2){ main.innerHTML = needMore(); return; }
+  oxList = shuffle(p).slice(0, Math.min(10, p.length)).map(it=>{
+    if(Math.random() < 0.5) return { it: it, word: it.word, isTrue: true };
+    const others = p.filter(o=>o.word !== it.word);
+    if(!others.length) return { it: it, word: it.word, isTrue: true };
+    return { it: it, word: shuffle(others)[0].word, isTrue: false };
+  });
+  oxIdx = 0; oxScore = 0; viewOX();
+}
+function viewOX(){
+  if(oxIdx >= oxList.length){ main.innerHTML = resultHtml('O,X 퀴즈', oxScore, oxList.length, 'startOX()'); return; }
+  oxAns = false; oxCur = oxList[oxIdx];
+  main.innerHTML = `<section class="card stage">
+    <div class="head-row">
+      <p class="count">${oxIdx+1} / ${oxList.length} · 점수 ${oxScore}</p>
+      ${bigBtn()}
+    </div>
+    <div class="progress"><span style="width:${oxIdx / oxList.length * 100}%"></span></div>
+    <div class="frame">${media(oxCur.it)}</div>
+    <p class="quiz-q">이 수어는 <b class="ox-word">${esc(oxCur.word)}</b> 일까요?</p>
+    <div class="ox-row">
+      <button class="ox-btn ox-o" onclick="answerOX(true)">O</button>
+      <button class="ox-btn ox-x" onclick="answerOX(false)">X</button>
+    </div>
+    <p id="fb" class="feedback"></p>
+    <button class="btn btn-primary" id="nextBtn" style="visibility:hidden" onclick="nextOX()">다음 ▶</button>
+  </section>`;
+  hydrate();
+}
+function answerOX(say){
+  if(oxAns) return; oxAns = true;
+  const ok = say === oxCur.isTrue;
+  if(ok) oxScore++;
+  const btnO = document.querySelector('.ox-o'), btnX = document.querySelector('.ox-x');
+  (say ? btnO : btnX).classList.add(ok ? 'right' : 'wrong');
+  if(!ok) (oxCur.isTrue ? btnO : btnX).classList.add('right');
+  document.getElementById('fb').textContent = ok ? '맞았어요!' : '아쉬워요! 정답은 ' + (oxCur.isTrue ? 'O' : 'X') + ' 입니다';
+  const nb = document.getElementById('nextBtn');
+  nb.style.visibility = 'visible';
+  nb.textContent = (oxIdx + 1 < oxList.length) ? '다음 ▶' : '결과 보기';
+}
+function nextOX(){ oxIdx++; viewOX(); }
+
+// ---------- 선 긋기 퀴즈 ----------
+let lnL = [], lnR = [], lnLink = {}, lnSel = null, lnChecked = false;
+function startLine(){
+  const p = pool();
+  if(p.length < 2){ main.innerHTML = needMore(); return; }
+  lnL = shuffle(p).slice(0, Math.min(4, p.length));
+  lnR = shuffle(lnL.map((_, i)=>i));   // 오른쪽 칸 순서 (값 = 왼쪽 번호)
+  lnLink = {}; lnSel = null; lnChecked = false;
+  viewLine();
+}
+function lnCorrect(l){ return lnLink[l] !== undefined && lnR[lnLink[l]] === Number(l); }
+function viewLine(){
+  const n = lnL.length;
+  const score = lnChecked ? lnL.map((_, i)=>i).filter(i=>lnCorrect(i)).length : 0;
+  const leftHtml = lnL.map((it, i)=>{
+    let cls = (lnSel === i ? 'sel ' : '') + (lnChecked ? (lnCorrect(i) ? 'ok' : 'ng') : '');
+    let inner;
+    if(it.hasVideo || it.videoUrl){
+      // 영상 문제: 네모칸 안에서 바로 재생, 아래 '이 칸 선택'을 눌러 선 잇기
+      const yt = it.videoUrl ? ytId(it.videoUrl) : null;
+      const player = it.hasVideo
+        ? `<video class="line-vid" data-vid="${it.id}" controls playsinline preload="metadata" onclick="event.stopPropagation()"></video>`
+        : (yt ? `<iframe class="line-vid" src="${ytEmbed(it, yt)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>`
+              : `<span class="noimg">영상 링크를 확인하세요</span>`);
+      inner = player + `<span class="pick-bar">이 칸 선택</span>`;
+      cls += ' isvid';
+    } else {
+      inner = pic(it.img, it);
+    }
+    return `<div class="line-item lt ${cls}" data-l="${i}" onclick="pickL(${i})">${inner}</div>`;
+  });
+  const rightHtml = lnR.map((k, pos)=>{
+    const linked = Object.keys(lnLink).find(l=>lnLink[l] === pos);
+    const st = (lnChecked && linked !== undefined) ? (lnCorrect(linked) ? 'ok' : 'ng') : '';
+    return `<button class="line-item rt ${st}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span></button>`;
+  });
+  main.innerHTML = `<section class="card stage">
+    <div class="head-row">
+      <p class="count">${lnChecked ? '결과 ' + score + ' / ' + n : '왼쪽 그림과 오른쪽 단어를 선으로 이어 주세요'}</p>
+      ${bigBtn()}
+    </div>
+    <div class="line-board" id="lineBoard">
+      <svg class="line-svg" id="lineSvg"></svg>
+      ${leftHtml.map((l, i)=> l + rightHtml[i]).join('')}
+    </div>
+    <div class="nav-row">
+      ${lnChecked ? '' : '<button class="btn btn-accent" onclick="checkLine()">채점하기</button>'}
+      <button class="btn btn-ghost" onclick="startLine()">다시 섞기</button>
+    </div>
+    ${lnChecked ? `<div class="save-box">
+      <input class="input" id="stuName" placeholder="학생 이름 (선택)" maxlength="20">
+      <button class="btn btn-success" id="saveBtn" onclick="saveResult('선 긋기 퀴즈',${score},${n})">점수 저장</button>
+    </div>` : ''}
+    ${recentBox()}
+  </section>`;
+  drawLines();
+  hydrate();
+}
+function pickL(i){
+  if(lnChecked) return;
+  if(lnLink[i] !== undefined){ delete lnLink[i]; lnSel = null; viewLine(); return; }  // 이미 이은 선 지우기
+  lnSel = (lnSel === i) ? null : i;
+  viewLine();
+}
+function pickR(pos){
+  if(lnChecked) return;
+  const linked = Object.keys(lnLink).find(l=>lnLink[l] === pos);
+  if(lnSel === null){ if(linked !== undefined) delete lnLink[linked]; viewLine(); return; }
+  if(linked !== undefined) delete lnLink[linked];
+  lnLink[lnSel] = pos; lnSel = null;
+  viewLine();
+}
+function checkLine(){ lnChecked = true; lnSel = null; viewLine(); }
+// 선 긋기 왼쪽 영상 문제: 가운데 팝업에서 영상 재생
+function openLineVid(i){ const it = lnL[i]; if(it) openVidPop(it); }
+function openVidPop(it){
+  closeLineVid();
+  const pop = document.createElement('div');
+  pop.className = 'vid-pop'; pop.id = 'vidPop';
+  pop.innerHTML = `<div class="vid-box"><div class="vid-top"><b>${esc(it.word)}</b><button class="btn btn-ghost sm" onclick="closeLineVid()">닫기</button></div>${media(it)}</div>`;
+  pop.addEventListener('click', e=>{ if(e.target === pop) closeLineVid(); });
+  document.body.appendChild(pop);
+  hydrate();
+}
+function closeLineVid(){ const p = document.getElementById('vidPop'); if(p) p.remove(); }
+function drawLines(){
+  const board = document.getElementById('lineBoard'), svg = document.getElementById('lineSvg');
+  if(!board || !svg) return;
+  const br = board.getBoundingClientRect();
+  svg.setAttribute('viewBox', '0 0 ' + br.width + ' ' + br.height);
+  let h = '';
+  Object.keys(lnLink).forEach(l=>{
+    const pos = lnLink[l];
+    const a = board.querySelector('[data-l="' + l + '"]'), b = board.querySelector('[data-r="' + pos + '"]');
+    if(!a || !b) return;
+    const ar = a.getBoundingClientRect(), bb = b.getBoundingClientRect();
+    const x1 = ar.right - br.left, y1 = ar.top + ar.height / 2 - br.top;
+    const x2 = bb.left - br.left, y2 = bb.top + bb.height / 2 - br.top;
+    const col = !lnChecked ? '#4dabf7' : (lnCorrect(l) ? '#40c057' : '#fa5252');
+    h += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="6" stroke-linecap="round"/>`;
+    h += `<circle cx="${x1}" cy="${y1}" r="7" fill="${col}"/><circle cx="${x2}" cy="${y2}" r="7" fill="${col}"/>`;
+  });
+  svg.innerHTML = h;
+}
+window.addEventListener('resize', ()=>{ if(current === 'line') drawLines(); });
+
+// ---------- 3. 단어 퀴즈 ----------
+let qList = [], qIdx = 0, qScore = 0, qAnswered = false, qCur = null;
+function startQuiz(){
+  const p = pool();
+  if(p.length<2){ main.innerHTML = needMore(); return; }
+  qList = shuffle(p); qIdx = 0; qScore = 0; viewQuiz();
+}
+function viewQuiz(){
+  if(qIdx >= qList.length){
+    const msg = qScore / qList.length >= 0.8 ? '아주 잘했어요! ' : '조금 더 연습해 볼까요? ';
+    main.innerHTML = `<section class="card stage">
+      <div class="head-row">${bigBtn()}</div>
+      
+      <div class="screen-head"><h2>퀴즈 끝!</h2><p>${msg}</p></div>
+      <p class="big-score">${qScore} / ${qList.length}</p>
+      <div class="save-box">
+        <input class="input" id="stuName" placeholder="학생 이름 (선택)" maxlength="20">
+        <button class="btn btn-success" id="saveBtn" onclick="saveScore()">점수 저장</button>
+      </div>
+      <button class="btn btn-primary" onclick="startQuiz()">다시 풀기</button>
+      ${recentBox()}
+    </section>`;
+    return;
+  }
+  qAnswered = false;
+  qCur = qList[qIdx];
+  const pct = qIdx / qList.length * 100;
+  const wrong = shuffle(pool().filter(x=>x.id !== qCur.id)).slice(0,3);
+  const opts = shuffle([qCur, ...wrong]);
+  main.innerHTML = `<section class="card stage">
+    <div class="head-row">
+      <p class="count">${qIdx+1} / ${qList.length} · 점수 ${qScore}</p>
+      ${bigBtn()}
+    </div>
+    <div class="progress"><span style="width:${pct}%"></span></div>
+    <div class="frame">${media(qCur)}</div>
+    <p class="quiz-q">무슨 단어일까요?</p>
+    <div class="opts">${opts.map(o=>`<button class="opt" onclick="answer(this,${o.id})">${esc(o.word)}</button>`).join('')}</div>
+    <p id="fb" class="feedback"></p>
+    <button class="btn btn-primary" id="nextBtn" style="visibility:hidden" onclick="nextQ()">다음 ▶</button>
+    ${recentBox()}
+  </section>`;
+  hydrate();
+}
+function answer(btn, id){
+  if(qAnswered) return;
+  qAnswered = true;
+  const ok = id === qCur.id;
+  if(ok) qScore++;
+  btn.classList.add(ok ? 'right' : 'wrong');
+  document.querySelectorAll('.opt').forEach(b=>{
+    if(b.textContent === qCur.word) b.classList.add('right');
+  });
+  document.getElementById('fb').textContent = ok ? ' 정답이에요!' : ' 아쉬워요! 정답은 ' + qCur.word + ' 입니다';
+  const nb = document.getElementById('nextBtn');
+  nb.style.visibility = 'visible';
+  nb.textContent = (qIdx + 1 < qList.length) ? '다음 ▶' : '결과 보기';
+}
+function nextQ(){ qIdx++; viewQuiz(); }
+
+// 퀴즈 화면 안의 최근 점수 상자
+function recentBox(){
+  const recs = [...scores].sort((a,b)=>b.id - a.id).slice(0,5);
+  return `<details class="rec-box">
+    <summary> 최근 점수 보기 (저장 ${scores.length}건)</summary>
+    ${recs.length ? `<table>
+      <tr><th>날짜</th><th>이름</th><th>단원</th><th>종류</th><th>점수</th></tr>
+      ${recs.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.kind || '단어 퀴즈')}</td><td>${r.score} / ${r.total}</td></tr>`).join('')}
+    </table>` : '<p class="hint">아직 저장된 점수가 없어요. 결과 화면에서  점수 저장을 눌러 보세요.</p>'}
+    <button class="btn btn-ghost sm" onclick="go('scores')">전체 점수 기록 열기</button>
+  </details>`;
+}
+
+// 퀴즈 점수 저장
+function saveScore(){
+  const name = (document.getElementById('stuName').value || '').trim() || '이름 없음';
+  scores.push({
+    id: Date.now(),
+    date: nowStr(),
+    name: name,
+    unit: unit,
+    score: qScore,
+    total: qList.length
+  });
+  if(!saveScores()) return;
+  const b = document.getElementById('saveBtn');
+  b.disabled = true;
+  b.textContent = ' 저장됨';
+}
+
+// ---------- 4. 점수 기록 ----------
+let scoreUnit = '전체';
+function viewScores(){
+  const all = [...scores].sort((a,b)=>b.id - a.id);
+  const units = [...new Set(scores.map(r=>r.unit))].sort();
+  if(scoreUnit !== '전체' && !units.includes(scoreUnit)) scoreUnit = '전체';
+  const recs = scoreUnit === '전체' ? all : all.filter(r=>r.unit === scoreUnit);
+  const total = recs.length;
+  const avg = total ? Math.round(recs.reduce((s,r)=>s + r.score/r.total, 0) / total * 100) : 0;
+  const byName = {};
+  recs.forEach(r=>{ (byName[r.name] = byName[r.name] || []).push(r); });
+  const names = Object.keys(byName).sort();
+  main.innerHTML = `<section class="card">
+    <div class="info">
+      <div class="screen-head"><h2>점수 기록</h2><p>퀴즈를 끝내고 저장한 점수가 여기에 모입니다.</p></div>
+      <div class="toolbar">
+        <select class="select" onchange="scoreUnit=this.value;viewScores()">
+          ${['전체',...units].map(u=>`<option value="${esc(u)}" ${u===scoreUnit?'selected':''}> ${esc(u)}</option>`).join('')}
+        </select>
+        <button class="btn btn-ghost sm" onclick="exportScores('all')">전체 엑셀 받기</button>
+        <button class="btn btn-ghost sm" onclick="exportScores('unit')">단원별 엑셀 받기</button>
+        <button class="btn btn-danger sm" onclick="clearScores()">전체 지우기</button>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><span>저장된 기록</span><b>${total}</b></div>
+      <div class="stat"><span>평균 정답률</span><b>${avg}%</b></div>
+      <div class="stat"><span>학생 수</span><b>${names.length}</b></div>
+    </div>
+    <h3 class="sub">학생별 평균</h3>
+    ${names.length ? `<div class="table-wrap"><table>
+      <tr><th>이름</th><th>횟수</th><th>평균 정답률</th></tr>
+      ${names.map(n=>{
+        const a = byName[n];
+        const p = Math.round(a.reduce((s,r)=>s + r.score/r.total, 0) / a.length * 100);
+        return `<tr><td>${esc(n)}</td><td>${a.length}회</td><td>${p}%</td></tr>`;
+      }).join('')}
+    </table></div>` : '<p class="hint">아직 기록이 없어요. 단어 퀴즈를 끝내고 점수를 저장해 보세요.</p>'}
+    ${total ? `<h3 class="sub">최근 기록</h3>
+    <div class="table-wrap"><table>
+      <tr><th>날짜</th><th>이름</th><th>단원</th><th>종류</th><th>점수</th><th></th></tr>
+      ${recs.map(r=>`<tr>
+        <td>${esc(r.date)}</td><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.kind || '단어 퀴즈')}</td>
+        <td>${r.score} / ${r.total}</td>
+        <td><button class="btn btn-danger sm" onclick="delScore(${r.id})">삭제</button></td>
+      </tr>`).join('')}
+    </table></div>` : ''}
+  </section>`;
+}
+function delScore(id){
+  if(!confirm('이 기록을 삭제할까요?')) return;
+  scores = scores.filter(r=>r.id !== id);
+  saveScores(); viewScores();
+}
+function clearScores(){
+  if(!confirm('모든 점수 기록을 지울까요? 되돌릴 수 없어요.')) return;
+  scores = []; saveScores(); viewScores();
+}
+function exportScores(mode){
+  // mode: 'all' = 전체 기록, 'unit' = 선택한 단원 기록만
+  let list = scores, fname = '수어_점수기록_전체.csv';
+  if(mode === 'unit'){
+    if(scoreUnit === '전체'){ alert('먼저 위의  단원 칸에서 단원을 골라 주세요.'); return; }
+    list = scores.filter(r=>r.unit === scoreUnit);
+    fname = '수어_점수기록_' + scoreUnit + '.csv';
+  }
+  if(!list.length){ alert('받을 기록이 없어요.'); return; }
+  const head = '날짜,이름,단원,종류,점수,전체,정답률\n';
+  const rows = list.map(r=>[r.date, r.name, r.unit, r.kind || '단어 퀴즈', r.score, r.total, Math.round(r.score/r.total*100)+'%'].join(','));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + head + rows.join('\n')], {type:'text/csv;charset=utf-8'}));
+  a.download = fname;
+  a.click();
+}
+
+// ---------- 5. 문제 만들기 ----------
+function viewEdit(){
+  const msg = flash; flash = '';
+  main.innerHTML = `<section class="card">
+    <div class="info">
+      <div class="screen-head"><h2>문제 만들기</h2><p>단어를 고치면 자동으로 저장돼요. 단원은 1과, 2과처럼 자유롭게 적으면 됩니다.</p></div>
+      <div class="toolbar">
+        <button class="btn btn-primary sm" onclick="addItem()">＋ 한 문제 추가</button>
+        <button class="btn btn-accent sm" onclick="openBulk()">한꺼번에 입력</button>
+        <button class="btn btn-accent sm" onclick="pickBulkFiles()">사진·영상 한꺼번에</button>
+        <input type="file" id="bulkFilesInput" multiple accept="image/*,video/*" hidden onchange="handleBulkFiles(this)">
+      </div>
+    </div>
+    ${msg ? `<div class="banner win">${msg}</div>` : ''}
+    <div class="toolbar">
+      <button class="btn btn-ghost sm" onclick="exportData()">백업 저장</button>
+      <label class="btn btn-ghost sm">백업 불러오기<input type="file" accept="application/json" hidden onchange="importData(this)"></label>
+      <button class="btn btn-ghost sm" onclick="resetData()">↺ 처음 문제로</button>
+    </div>
+    <p class="hint">총 ${items.length}개 · 사진·영상 파일은 이 브라우저에 저장됩니다.</p>
+    ${bulkOpen ? bulkHTML() : ''}
+    <div class="edit-list">${items.map((it,i)=>`
+      <div class="item">
+        <div class="thumb">${pic(it.img, it)}${(it.hasVideo || it.videoUrl) ? '<span class="badge">영상</span>' : ''}</div>
+        <div class="fields">
+          <input class="input" value="${esc(it.word)}" placeholder="단어 (예: 안녕하세요)" onchange="upd(${i},'word',this.value)">
+          <input class="input" value="${esc(it.unit || '')}" placeholder="단원 (예: 1과)" onchange="upd(${i},'unit',this.value)">
+          <input class="input wide" value="${esc(it.videoUrl || '')}" placeholder="영상 링크 (유튜브 주소, 선택)" onchange="upd(${i},'videoUrl',this.value)">
+          ${it.videoUrl ? `<div class="range-row">
+            <input class="input" value="${it.vStart ? esc(it.vStart) : ''}" placeholder="시작 (예: 0:10)" onchange="upd(${i},'vStart',this.value)">
+            <input class="input" value="${it.vEnd ? esc(it.vEnd) : ''}" placeholder="끝 (예: 0:20, 비우면 끝까지)" onchange="upd(${i},'vEnd',this.value)">
+          </div>` : ''}
+        </div>
+        <button class="btn btn-danger sm" onclick="delItem(${i})">삭제</button>
+        <div class="item-actions">
+          ${chipsHtml(it)}
+          <label class="btn btn-ghost sm">사진 올리기<input type="file" accept="image/*" hidden onchange="uploadImg(${i},this)"></label>
+          <label class="btn btn-ghost sm">영상 파일 올리기<input type="file" accept="video/*" hidden onchange="uploadVideo(${i},this)"></label>
+          ${it.hasVideo ? `<button class="btn btn-ghost sm" onclick="clearVideo(${i})">영상 파일 지우기</button>` : ''}
+        </div>
+      </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+// 한꺼번에 입력 패널
+function bulkHTML(){
+  return `<div class="bulk">
+    <h3>한꺼번에 입력</h3>
+    <ol>
+      <li>구글 시트나 엑셀에 한 줄에 한 문제씩 적습니다. (단어 / 빈칸 / 영상 링크 / 단원)</li>
+      <li>아래 칸에 붙여넣거나 직접 적습니다. 쉼표나 탭으로 칸을 나눕니다.</li>
+      <li>"N개 문제가 인식됐어요"를 확인하고 <b>추가하기</b>를 누릅니다.</li>
+      <li>사진과 영상은 여기서 넣지 않습니다. 파일 이름을 단어와 같게 바꾼 뒤(예: <b>안녕하세요.jpg</b>, <b>안녕하세요.mp4</b>) <b>사진·영상 한꺼번에</b> 버튼으로 한 번에 올리세요.</li>
+    </ol>
+    <p class="example">안녕하세요, , , 1과
+사랑해요, , https://youtu.be/xxxxxxxxxxx, 1과</p>
+    <div style="height:12px"></div>
+    <textarea id="bulkText" placeholder="여기에 붙여넣으세요" oninput="bulkPreview()"></textarea>
+    <div class="bulk-foot">
+      <div>
+        <p id="bulkCount" class="bulk-count">0개 문제가 인식됐어요</p>
+        <label><input type="checkbox" id="bulkReset"> 기존 문제는 모두 지우고 새로 만들기</label>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-ghost sm" onclick="downloadTemplate()">입력표 받기</button>
+        <button class="btn btn-ghost sm" onclick="openBulk(false)">닫기</button>
+        <button class="btn btn-success" onclick="bulkApply()">추가하기</button>
+      </div>
+    </div>
+  </div>`;
+}
+function openBulk(on){
+  bulkOpen = (on === false) ? false : !bulkOpen;
+  viewEdit();
+  if(bulkOpen){
+    const t = document.getElementById('bulkText');
+    if(t) t.focus();
+  }
+}
+function parseBulk(text){
+  const out = [];
+  text.split(/\r?\n/).forEach((line, n)=>{
+    const cols = line.split(/\t|,/).map(s=>s.trim());
+    const word = cols[0];
+    if(!word || word === '단어') return;
+    out.push({
+      id: Date.now() + n + Math.floor(Math.random()*1000),
+      word: word,
+      img: '',
+      videoUrl: cols[2] || '',
+      unit: cols[3] || ''
+    });
+  });
+  return out;
+}
+function bulkPreview(){
+  const n = parseBulk(document.getElementById('bulkText').value).length;
+  document.getElementById('bulkCount').textContent = n + '개 문제가 인식됐어요';
+}
+function bulkApply(){
+  const list = parseBulk(document.getElementById('bulkText').value);
+  if(!list.length){
+    alert('추가할 단어가 없어요. 한 줄에 한 단어씩 적어 주세요.');
+    return;
+  }
+  if(document.getElementById('bulkReset').checked){
+    items.forEach(it=>{ if(it.hasVideo) delVideo(it.id).catch(()=>{}); });
+    items = [];
+  }
+  items.push(...list);
+  save();
+  bulkOpen = false;
+  flash = ' ' + list.length + '개 문제를 추가했어요!';
+  viewEdit();
+}
+
+// 사진·영상 파일을 한꺼번에 올리기 (파일 이름 = 단어)
+function pickBulkFiles(){ document.getElementById('bulkFilesInput').click(); }
+function readImage(file, max){
+  return new Promise(res=>resizeImage(file, max, res));
+}
+async function handleBulkFiles(input){
+  const files = [...input.files];
+  input.value = '';
+  if(!files.length) return;
+  let pics = 0, vids = 0, added = 0, tooBig = 0;
+  for(const f of files){
+    const isImg = f.type.startsWith('image/');
+    const isVid = f.type.startsWith('video/');
+    if(!isImg && !isVid) continue;
+    const word = f.name.replace(/\.[^.]+$/, '').trim().normalize('NFC');
+    if(!word) continue;
+    let it = items.find(x=>String(x.word).trim().normalize('NFC') === word);
+    if(!it){
+      it = {id: Date.now() + Math.floor(Math.random()*100000), word: word, img: '', unit: unit === '전체' ? '' : unit};
+      items.push(it);
+      added++;
+    }
+    try{
+      if(isVid){
+        if(f.size > 60 * 1024 * 1024){ tooBig++; continue; }
+        await putVideo(it.id, f);
+        it.hasVideo = true; vids++;
+      }else{
+        it.img = await readImage(f, 400); pics++;
+      }
+    }catch(e){}
+  }
+  save();
+  flash = ` 사진 ${pics}개, 영상 ${vids}개 연결 · 새 문제 ${added}개 추가`
+    + (tooBig ? ` (60MB를 넘는 영상 ${tooBig}개는 제외)` : '');
+  viewEdit();
+}
+function downloadTemplate(){
+  const csv = '\uFEFF단어,빈칸,영상링크,단원\n안녕하세요,,,1과\n감사합니다,,,1과\n사랑해요,,,1과\n가족,,,2과\n';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = '수어문제_입력표.csv';
+  a.click();
+}
+
+// 한 문제씩 고치기
+function upd(i, key, val){
+  if(key==='word') items[i].word = val.trim() || '(단어 없음)';
+  if(key==='unit') items[i].unit = val.trim();
+  if(key==='img') items[i].img = val.trim() || '';
+  if(key==='videoUrl') items[i].videoUrl = val.trim();
+  if(key==='vStart') items[i].vStart = parseSec(val);
+  if(key==='vEnd') items[i].vEnd = parseSec(val);
+  save();
+  viewEdit();
+}
+function addItem(){
+  items.push({id: Date.now(), word: '새 단어', img: '', unit: unit === '전체' ? '' : unit});
+  save(); viewEdit();
+}
+function delItem(i){
+  if(confirm('이 문제를 삭제할까요?')){
+    const it = items[i];
+    if(it.hasVideo) delVideo(it.id).catch(()=>{});
+    items.splice(i,1); save(); viewEdit();
+  }
+}
+function uploadImg(i, input){
+  const file = input.files[0];
+  if(!file) return;
+  resizeImage(file, 400, url=>{
+    items[i].img = url;
+    if(save()) viewEdit();
+  });
+}
+async function uploadVideo(i, input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 60 * 1024 * 1024){
+    alert('영상이 너무 커요 (60MB 이하만 가능). 짧게 줄이거나 영상 링크(유튜브)를 이용해 주세요.');
+    return;
+  }
+  try{
+    await putVideo(items[i].id, file);
+    items[i].hasVideo = true;
+    save(); viewEdit();
+    openVidPop(items[i]);   // 올린 영상을 앞에 띄워서 확인
+  }catch(e){
+    alert('영상을 저장하지 못했어요. 크롬에서 다시 시도해 주세요.');
+  }
+}
+async function clearVideo(i){
+  if(!confirm('이 문제의 영상 파일을 지울까요?')) return;
+  try{ await delVideo(items[i].id); }catch(e){}
+  items[i].hasVideo = false;
+  save(); viewEdit();
+}
+function resizeImage(file, max, cb){
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const im = new Image();
+    im.onload = ()=>{
+      const s = Math.min(1, max / Math.max(im.width, im.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(im.width * s);
+      c.height = Math.round(im.height * s);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      cb(c.toDataURL('image/jpeg', 0.85));
+    };
+    im.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function resetData(){
+  if(confirm('모든 문제를 처음 상태(샘플)로 되돌릴까요? 만든 내용은 사라집니다.')){
+    items.forEach(it=>{ if(it.hasVideo) delVideo(it.id).catch(()=>{}); });
+    items = SAMPLE.map(x=>({...x})); unit = '전체'; save(); viewEdit();
+  }
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify(items)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '수어문제_백업.json';
+  a.click();
+}
+function importData(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const d = JSON.parse(e.target.result);
+      if(!Array.isArray(d)) throw new Error();
+      items = d; save();
+      flash = ' 백업을 불러왔어요! (영상 파일은 다시 올려 주세요)';
+      viewEdit();
+    }catch(err){
+      alert('올바른 백업 파일이 아니에요.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ---------- 사용설명서 · 키보드 ----------
+function openGuide(){ document.getElementById('guide').classList.add('open'); }
+function closeGuide(){ document.getElementById('guide').classList.remove('open'); }
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape'){ closeGuide(); return; }
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if(current !== 'study' || !sList.length) return;
+  if(e.key === 'ArrowRight'){ moveS(1); }
+  else if(e.key === 'ArrowLeft'){ moveS(-1); }
+  else if(e.key === ' '){ e.preventDefault(); toggleS(); }
+});
+
+// 시작
+go('study');
+</script>
+</body>
+</html>
