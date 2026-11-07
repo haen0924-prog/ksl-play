@@ -467,7 +467,7 @@ body.bigmode .line-board .line-item .dot-l{left:-36px}
         <h3>① 화면 소개 (위쪽 메뉴)</h3>
         <div class="g-steps">
           <div class="g-step"><div><b>학습카드</b><p>그림이나 영상을 보고 단어를 떠올립니다. "정답 보기"로 단어를 확인하고, "5초 생각하기"로 먼저 생각할 시간을 줄 수 있어요.</p></div></div>
-          <div class="g-step"><div><b>짝맞추기</b><p>처음 미리보기 시간 동안 카드 위치를 외운 뒤, 같은 그림과 단어의 짝을 찾습니다. 화면 위의 <b>2쌍 · 4쌍 · 8쌍</b> 버튼으로 카드 수를 고를 수 있어요. 미리보기는 2쌍 2초, 4쌍 3초, 8쌍 5초입니다.</p></div></div>
+          <div class="g-step"><div><b>짝맞추기</b><p>처음 미리보기 시간 동안 카드 위치를 외운 뒤, 같은 그림과 단어의 짝을 찾습니다. 화면 위의 <b>2쌍 · 4쌍 · 8쌍</b> 버튼으로 카드 수를 고를 수 있어요. 미리보기는 2쌍 2초, 4쌍 3초, 8쌍 5초입니다. 사진이나 올린 영상 파일이 있는 문제만 나오고, <b>유튜브 영상은 짝맞추기에서 빠집니다.</b></p></div></div>
           <div class="g-step"><div><b>단어 퀴즈</b><p>그림을 보고 4개 중 맞는 단어를 고릅니다. 끝나면 이름을 적고 점수를 저장할 수 있어요.</p></div></div>
           <div class="g-step"><div><b>점수 기록</b><p>학생별 평균과 최근 기록을 봅니다. 엑셀(CSV) 파일로 받을 수도 있어요.</p></div></div>
           <div class="g-step"><span class="g-ico">✏</span><div><b>문제 만들기</b><p>단어, 그림, 영상을 넣고 고치는 곳입니다.</p></div></div>
@@ -579,11 +579,11 @@ body.bigmode .line-board .line-item .dot-l{left:-36px}
         <h3>⑨ O,X 퀴즈 · 선 긋기 퀴즈</h3>
         <div class="g-steps">
           <div class="g-step"><div><b>O,X 퀴즈</b><p>그림을 보고 화면에 나온 단어가 맞으면 , 틀리면 를 누릅니다. 한 번에 최대 10문제가 나와요.</p></div></div>
-          <div class="g-step"><div><b>선 긋기 퀴즈</b><p>왼쪽 그림을 누른 뒤 오른쪽 단어를 누르면 선이 이어집니다. 잘못 이었으면 이은 칸을 다시 누르면 지워져요.</p></div></div>
+          <div class="g-step"><div><b>선 긋기 퀴즈</b><p>왼쪽 그림 칸 오른쪽의 <b>점</b>을 누른 뒤, 오른쪽 단어 칸 왼쪽의 <b>점</b>을 누르면 선이 이어집니다. 점은 누르면 채워지고, 잘못 이었으면 이은 점을 다시 누르면 지워져요.</p></div></div>
           <div class="g-step"><div><b>채점하기</b><p>선 긋기는 다 이은 뒤 " 채점하기"를 누르세요. 맞은 선은 초록색, 틀린 선은 빨간색으로 보입니다.</p></div></div>
           <div class="g-step"><div><b>점수 저장</b><p>끝난 뒤 " 점수 저장"을 누르면 기록에 남습니다. 점수 기록 표에서 "종류" 칸으로 어떤 퀴즈인지 구분할 수 있어요.</p></div></div>
         </div>
-        <div class="g-tip">사진이나 영상이 있는 문제만 게임에 나옵니다. 선 긋기 퀴즈의 영상은 칸 안에서 바로 재생하고, 아래 '이 칸 선택'을 눌러 선을 잇습니다.</div>
+        <div class="g-tip">사진이나 영상이 있는 문제만 게임에 나옵니다. 선 긋기의 유튜브 영상은 칸에 썸네일로 보이고, <b>'재생' 버튼</b>을 누르면 재생됩니다. 영상 칸 어디를 눌러도 선택돼요.</div>
       </section>
 
     </div>
@@ -885,7 +885,8 @@ let mCards = [], mFirst = null, mLock = false, mMoves = 0, mDone = 0, mPreview =
 function setPairs(n){ mPairs = n; startMatch(); }
 function startMatch(){
   // 영상 문제도 그림(사진·이모지) 쪽 카드로 함께 사용
-  const p = pool();
+  // 유튜브 영상은 짝맞추기에서 제외 (로딩이 느려 미리보기와 맞지 않음). 사진 또는 올린 영상 파일만 사용
+  const p = pool().filter(it => (it.img || '').startsWith('data:') || it.hasVideo);
   if(p.length<2){ main.innerHTML = needMore(); return; }
   const pick = shuffle(p).slice(0, Math.min(mPairs, p.length));
   mCards = shuffle(pick.flatMap(it=>[
@@ -1033,13 +1034,13 @@ function answerOX(say){
 function nextOX(){ oxIdx++; viewOX(); }
 
 // ---------- 선 긋기 퀴즈 ----------
-let lnL = [], lnR = [], lnLink = {}, lnSel = null, lnChecked = false;
+let lnL = [], lnR = [], lnLink = {}, lnSel = null, lnRSel = null, lnChecked = false;
 function startLine(){
   const p = pool();
   if(p.length < 2){ main.innerHTML = needMore(); return; }
   lnL = shuffle(p).slice(0, Math.min(4, p.length));
   lnR = shuffle(lnL.map((_, i)=>i));   // 오른쪽 칸 순서 (값 = 왼쪽 번호)
-  lnLink = {}; lnSel = null; lnChecked = false;
+  lnLink = {}; lnSel = null; lnRSel = null; lnChecked = false;
   viewLine();
 }
 function lnCorrect(l){ return lnLink[l] !== undefined && lnR[lnLink[l]] === Number(l); }
@@ -1066,7 +1067,7 @@ function viewLine(){
   const rightHtml = lnR.map((k, pos)=>{
     const linked = Object.keys(lnLink).find(l=>lnLink[l] === pos);
     const st = (lnChecked && linked !== undefined) ? (lnCorrect(linked) ? 'ok' : 'ng') : '';
-    return `<button class="line-item rt ${st}${linked !== undefined ? ' linked' : ''}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span><span class="dot dot-l"></span></button>`;
+    return `<button class="line-item rt ${st}${linked !== undefined ? ' linked' : ''}${lnRSel === pos ? ' sel' : ''}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span><span class="dot dot-l"></span></button>`;
   });
   main.innerHTML = `<section class="card stage">
     <div class="head-row">
@@ -1104,15 +1105,22 @@ function ytPlay(btn){
 function pickL(i){
   if(lnChecked) return;
   if(lnLink[i] !== undefined){ delete lnLink[i]; lnSel = null; viewLine(); return; }  // 이미 이은 선 지우기
+  if(lnRSel !== null){ // 오른쪽을 먼저 누른 경우: 바로 잇기
+    lnLink[i] = lnRSel; lnRSel = null; lnSel = null; viewLine(); return;
+  }
   lnSel = (lnSel === i) ? null : i;
   viewLine();
 }
 function pickR(pos){
   if(lnChecked) return;
   const linked = Object.keys(lnLink).find(l=>lnLink[l] === pos);
-  if(lnSel === null){ if(linked !== undefined) delete lnLink[linked]; viewLine(); return; }
-  if(linked !== undefined) delete lnLink[linked];
-  lnLink[lnSel] = pos; lnSel = null;
+  if(lnSel !== null){ // 왼쪽을 먼저 누른 경우: 바로 잇기
+    if(linked !== undefined) delete lnLink[linked];
+    lnLink[lnSel] = pos; lnSel = null; lnRSel = null;
+    viewLine(); return;
+  }
+  if(linked !== undefined && lnRSel === null){ delete lnLink[linked]; viewLine(); return; } // 이미 이은 선 지우기
+  lnRSel = (lnRSel === pos) ? null : pos; // 오른쪽을 먼저 선택
   viewLine();
 }
 function checkLine(){ lnChecked = true; lnSel = null; viewLine(); }
