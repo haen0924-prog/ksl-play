@@ -383,6 +383,16 @@ body.bigmode .ox-btn{width:150px;height:150px;font-size:70px}
 .yt-wrap{position:relative;overflow:hidden;background:#000}
 .yt-wrap .yt-frame{position:absolute;inset:0;width:100%;height:100%;border:0}
 .yt-cover{position:absolute;inset:0;cursor:pointer}
+
+/* 선 긋기 · 큰 화면(전체 화면): 화면 높이를 꽉 채우고 영상 칸을 키움 */
+body.bigmode .line-board{max-width:none;width:100%;height:calc(100vh - 230px);min-height:360px;grid-template-rows:repeat(var(--rows,4),minmax(0,1fr));row-gap:14px;column-gap:14vw;padding:0}
+body.bigmode .line-board .line-col{display:contents}
+body.bigmode .line-board .line-item.lt{height:100%;min-height:0;padding:10px}
+body.bigmode .line-board .line-item.lt.isvid{justify-content:flex-start;gap:8px}
+body.bigmode .line-board .line-vid{height:calc(100% - 52px);min-height:0;width:100%}
+body.bigmode .line-board .line-item.lt img{height:100%;width:auto;max-width:100%}
+body.bigmode .line-board .line-item.rt{height:100%;min-height:0;font-size:clamp(22px,2.6vw,44px)}
+body.bigmode .line-board .pick-bar{font-size:clamp(14px,1.4vw,20px);padding:8px 0}
 </style>
 </head>
 <body>
@@ -1028,7 +1038,7 @@ function viewLine(){
       <p class="count">${lnChecked ? '결과 ' + score + ' / ' + n : '왼쪽 그림과 오른쪽 단어를 선으로 이어 주세요'}</p>
       ${bigBtn()}
     </div>
-    <div class="line-board" id="lineBoard">
+    <div class="line-board" id="lineBoard" style="--rows:${lnL.length}">
       <svg class="line-svg" id="lineSvg"></svg>
       ${leftHtml.map((l, i)=> l + rightHtml[i]).join('')}
     </div>
