@@ -378,6 +378,11 @@ body.bigmode .ox-btn{width:150px;height:150px;font-size:70px}
 .line-board .line-item.rt{height:auto;min-height:72px}
 
 .range-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+
+/* 유튜브 칸: 화면 전체를 감싸고 누르면 재생/정지 */
+.yt-wrap{position:relative;overflow:hidden;background:#000}
+.yt-wrap .yt-frame{position:absolute;inset:0;width:100%;height:100%;border:0}
+.yt-cover{position:absolute;inset:0;cursor:pointer}
 </style>
 </head>
 <body>
@@ -708,11 +713,21 @@ function parseSec(v){
 }
 // 유튜브 임베드 주소 (시작·끝 시간 포함)
 function ytEmbed(it, id, extra){
-  const q = extra ? extra.split('&') : [];
+  // 유튜브 제목·공유·관련 영상 등을 숨기고 수어 화면만 보이게 함
+  const opt = { controls: '0', rel: '0', modestbranding: '1', iv_load_policy: '3', enablejsapi: '1', playsinline: '1' };
+  if(extra) extra.split('&').forEach(kv=>{ const a = kv.split('='); opt[a[0]] = a[1]; });
+  const q = Object.keys(opt).map(k=>k + '=' + opt[k]);
   const st = it.vStart || 0, en = it.vEnd || 0;
   if(st > 0) q.push('start=' + st);
   if(en > 0 && en > st) q.push('end=' + en);
-  return 'https://www.youtube.com/embed/' + id + (q.length ? '?' + q.join('&') : '');
+  return 'https://www.youtube.com/embed/' + id + '?' + q.join('&');
+}
+// 화면을 누르면 재생/일시정지 (유튜브 조작 막대를 숨겼기 때문)
+function ytToggle(cover){
+  const f = cover.previousElementSibling;
+  const playing = cover.dataset.p === '1';
+  if(f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func: playing ? 'pauseVideo' : 'playVideo', args: [] }), '*');
+  cover.dataset.p = playing ? '0' : '1';
 }
 function ytId(url){
   const m = String(url).match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
@@ -721,7 +736,7 @@ function ytId(url){
 function media(it){
   if(it.videoUrl){
     const id = ytId(it.videoUrl);
-    if(id) return `<iframe class="vid" src="${ytEmbed(it, id)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+    if(id) return `<div class="vid yt-wrap"><iframe class="yt-frame" src="${ytEmbed(it, id)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="yt-cover" data-p="0" onclick="ytToggle(this)"></div></div>`;
     return `<a class="btn btn-primary" href="${esc(it.videoUrl)}" target="_blank" rel="noopener"> 영상 열기</a>`;
   }
   if(it.hasVideo) return `<video class="vid" data-vid="${it.id}" controls playsinline></video>`;
@@ -994,7 +1009,7 @@ function viewLine(){
       const yt = it.videoUrl ? ytId(it.videoUrl) : null;
       const player = it.hasVideo
         ? `<video class="line-vid" data-vid="${it.id}" controls playsinline preload="metadata" onclick="event.stopPropagation()"></video>`
-        : (yt ? `<iframe class="line-vid" src="${ytEmbed(it, yt)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>`
+        : (yt ? `<div class="line-vid yt-wrap"><iframe class="yt-frame" src="${ytEmbed(it, yt)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="yt-cover" data-p="0" onclick="ytToggle(this)"></div></div>`
               : `<span class="noimg">영상 링크를 확인하세요</span>`);
       inner = player + `<span class="pick-bar">이 칸 선택</span>`;
       cls += ' isvid';
