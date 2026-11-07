@@ -403,6 +403,23 @@ body.bigmode .line-board .pick-bar{font-size:clamp(14px,1.4vw,20px);padding:8px 
 .line-board > .line-item.rt:nth-child(4n){transform:translateX(4vw)}
 body.bigmode .line-board > .line-item.lt:nth-child(4n+3),
 body.bigmode .line-board > .line-item.rt:nth-child(4n){transform:translateX(4vw)}
+
+/* 선 긋기 2차: 점으로 연결, 영상 확대, 단어 칸·글자 절반 */
+.line-item{position:relative}
+.line-item .dot{position:absolute;width:18px;height:18px;border-radius:50%;background:#1864ab;border:3px solid #fff;box-shadow:0 0 0 2px #74c0fc;top:50%;transform:translateY(-50%);pointer-events:none}
+.line-item .dot-r{right:-30px}
+.line-item .dot-l{left:-30px}
+.line-board .line-item.lt{overflow:visible}
+.line-board .line-item.lt.isvid{justify-content:center;padding:8px}
+.line-board .line-vid{height:clamp(160px,19vh,200px)}
+.line-board .line-item.rt{height:clamp(36px,7vh,50px);min-height:0;font-size:10px;padding:4px}
+body.bigmode .line-board{height:calc(100vh - 160px)}
+body.bigmode .line-board .line-vid{height:calc(100% - 20px)}
+body.bigmode .line-board .line-item.lt.isvid{justify-content:center;gap:0}
+body.bigmode .line-board .line-item.rt{height:50%;align-self:center;font-size:clamp(11px,1.3vw,22px)}
+body.bigmode .line-board .line-item.lt .dot{width:24px;height:24px}
+body.bigmode .line-board .line-item .dot-r{right:-36px}
+body.bigmode .line-board .line-item .dot-l{left:-36px}
 </style>
 </head>
 <body>
@@ -1031,17 +1048,17 @@ function viewLine(){
         ? `<video class="line-vid" data-vid="${it.id}" controls playsinline preload="metadata"></video>`
         : (yt ? `<div class="line-vid yt-wrap" data-src="${ytEmbed(it, yt)}"><img class="yt-thumb" src="https://img.youtube.com/vi/${yt}/hqdefault.jpg" alt=""><button type="button" class="yt-play" onclick="event.stopPropagation();ytPlay(this)">&#9654; 재생</button></div>`
               : `<span class="noimg">영상 링크를 확인하세요</span>`);
-      inner = player + `<span class="pick-bar">이 칸 선택</span>`;
+      inner = player;
       cls += ' isvid';
     } else {
       inner = pic(it.img, it);
     }
-    return `<div class="line-item lt ${cls}" data-l="${i}" onclick="pickL(${i})">${inner}</div>`;
+    return `<div class="line-item lt ${cls}" data-l="${i}" onclick="pickL(${i})">${inner}<span class="dot dot-r"></span></div>`;
   });
   const rightHtml = lnR.map((k, pos)=>{
     const linked = Object.keys(lnLink).find(l=>lnLink[l] === pos);
     const st = (lnChecked && linked !== undefined) ? (lnCorrect(linked) ? 'ok' : 'ng') : '';
-    return `<button class="line-item rt ${st}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span></button>`;
+    return `<button class="line-item rt ${st}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span><span class="dot dot-l"></span></button>`;
   });
   main.innerHTML = `<section class="card stage">
     <div class="head-row">
@@ -1113,12 +1130,12 @@ function drawLines(){
     const pos = lnLink[l];
     const a = board.querySelector('[data-l="' + l + '"]'), b = board.querySelector('[data-r="' + pos + '"]');
     if(!a || !b) return;
-    const ar = a.getBoundingClientRect(), bb = b.getBoundingClientRect();
-    const x1 = ar.right - br.left, y1 = ar.top + ar.height / 2 - br.top;
-    const x2 = bb.left - br.left, y2 = bb.top + bb.height / 2 - br.top;
+    const ad = a.querySelector('.dot') || a, bd = b.querySelector('.dot') || b;
+    const ar = ad.getBoundingClientRect(), bb = bd.getBoundingClientRect();
+    const x1 = ar.left + ar.width / 2 - br.left, y1 = ar.top + ar.height / 2 - br.top;
+    const x2 = bb.left + bb.width / 2 - br.left, y2 = bb.top + bb.height / 2 - br.top;
     const col = !lnChecked ? '#4dabf7' : (lnCorrect(l) ? '#40c057' : '#fa5252');
     h += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="6" stroke-linecap="round"/>`;
-    h += `<circle cx="${x1}" cy="${y1}" r="7" fill="${col}"/><circle cx="${x2}" cy="${y2}" r="7" fill="${col}"/>`;
   });
   svg.innerHTML = h;
 }
