@@ -412,7 +412,7 @@ body.bigmode .line-board > .line-item.rt:nth-child(4n){transform:translateX(4vw)
 .line-board .line-item.lt{overflow:visible}
 .line-board .line-item.lt.isvid{justify-content:center;padding:8px}
 .line-board .line-vid{height:clamp(160px,19vh,200px)}
-.line-board .line-item.rt{height:clamp(36px,7vh,50px);min-height:0;font-size:10px;padding:4px}
+.line-board .line-item.rt{height:clamp(36px,7vh,50px);min-height:0;font-size:20px;padding:4px}
 body.bigmode .line-board{height:calc(100vh - 160px)}
 body.bigmode .line-board .line-vid{height:calc(100% - 20px)}
 body.bigmode .line-board .line-item.lt.isvid{justify-content:center;gap:0}
@@ -420,6 +420,14 @@ body.bigmode .line-board .line-item.rt{height:50%;align-self:center;font-size:cl
 body.bigmode .line-board .line-item.lt .dot{width:24px;height:24px}
 body.bigmode .line-board .line-item .dot-r{right:-36px}
 body.bigmode .line-board .line-item .dot-l{left:-36px}
+
+/* 선 긋기 3차: 빈 동그라미 → 클릭하면 채워짐, 선은 동그라미끼리 연결 */
+.line-svg{z-index:5}
+.line-item .dot{background:#fff;border:3px solid #1864ab;box-shadow:none;pointer-events:auto;cursor:pointer}
+.line-item.sel .dot{background:#ff922b;border-color:#ff922b}
+.line-item.linked .dot{background:#1864ab;border-color:#1864ab}
+.line-item.ok .dot{background:#40c057;border-color:#40c057}
+.line-item.ng .dot{background:#fa5252;border-color:#fa5252}
 </style>
 </head>
 <body>
@@ -1039,7 +1047,7 @@ function viewLine(){
   const n = lnL.length;
   const score = lnChecked ? lnL.map((_, i)=>i).filter(i=>lnCorrect(i)).length : 0;
   const leftHtml = lnL.map((it, i)=>{
-    let cls = (lnSel === i ? 'sel ' : '') + (lnChecked ? (lnCorrect(i) ? 'ok' : 'ng') : '');
+    let cls = (lnSel === i ? 'sel ' : '') + (lnLink[i] !== undefined ? 'linked ' : '') + (lnChecked ? (lnCorrect(i) ? 'ok' : 'ng') : '');
     let inner;
     if(it.hasVideo || it.videoUrl){
       // 영상 문제: 네모칸 안에서 바로 재생, 아래 '이 칸 선택'을 눌러 선 잇기
@@ -1058,7 +1066,7 @@ function viewLine(){
   const rightHtml = lnR.map((k, pos)=>{
     const linked = Object.keys(lnLink).find(l=>lnLink[l] === pos);
     const st = (lnChecked && linked !== undefined) ? (lnCorrect(linked) ? 'ok' : 'ng') : '';
-    return `<button class="line-item rt ${st}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span><span class="dot dot-l"></span></button>`;
+    return `<button class="line-item rt ${st}${linked !== undefined ? ' linked' : ''}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span><span class="dot dot-l"></span></button>`;
   });
   main.innerHTML = `<section class="card stage">
     <div class="head-row">
