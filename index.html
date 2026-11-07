@@ -453,6 +453,29 @@ body.bigmode .line-board > :nth-child(8).line-item.lt .dot-r{right:18px}
 .line-board > :nth-child(6).line-item.lt .dot-r{right:14px}
 body.bigmode .line-board > :nth-child(2).line-item.lt .dot-r,
 body.bigmode .line-board > :nth-child(6).line-item.lt .dot-r{right:18px}
+
+/* 퀴즈: 단어를 먼저 보여주고 그림·영상 4개 중 고르기 */
+.quiz-word{font-size:clamp(26px,3vw,40px);font-weight:900;color:#1864ab;text-align:center;margin:18px 0 14px}
+.qopts{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:960px;margin:0 auto}
+.qopt{position:relative;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#000;border:4px solid #d0ebff;cursor:pointer;transition:transform .12s}
+.qopt:hover{transform:translateY(-2px)}
+.qopt img,.qopt video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.qopt .yt-wrap{position:absolute;inset:0;height:auto}
+.qopt .yt-wrap .yt-thumb{width:100%;height:100%;object-fit:contain;background:#000}
+.qopt .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:800}
+.qopt.right{border-color:#40c057;box-shadow:0 0 0 4px #ebfbee}
+.qopt.wrong{border-color:#fa5252;box-shadow:0 0 0 4px #fff5f5}
+.qopts:has(.qopt.right, .qopt.wrong) .qopt:not(.right):not(.wrong){opacity:.55}
+
+/* 긴 단어·문장: 길이에 따라 글자 크기를 자동으로 줄임 (칸은 글자에 맞춰 늘어남) */
+.line-board .line-item.rt.long{font-size:15px;line-height:1.35}
+.line-board .line-item.rt.xlong{font-size:12px;line-height:1.35}
+body.bigmode .line-board > .line-item.rt.long{font-size:clamp(9px,1vw,17px)}
+body.bigmode .line-board > .line-item.rt.xlong{font-size:clamp(8px,0.8vw,13px)}
+.quiz-word.long{font-size:clamp(20px,2.2vw,30px)}
+.quiz-word.xlong{font-size:clamp(17px,1.8vw,24px)}
+.ox-word.long{font-size:0.8em}
+.ox-word.xlong{font-size:0.62em}
 </style>
 </head>
 <body>
@@ -467,7 +490,7 @@ body.bigmode .line-board > :nth-child(6).line-item.lt .dot-r{right:18px}
     <nav class="tabs">
       <button class="tab on" data-v="study" onclick="go('study')">학습카드</button>
       <button class="tab" data-v="match" onclick="go('match')">짝맞추기</button>
-      <button class="tab" data-v="quiz" onclick="go('quiz')">단어 퀴즈</button>
+      <button class="tab" data-v="quiz" onclick="go('quiz')">퀴즈</button>
       <button class="tab" data-v="ox" onclick="go('ox')">O,X 퀴즈</button>
       <button class="tab" data-v="line" onclick="go('line')">선 긋기</button>
       <button class="tab" data-v="scores" onclick="go('scores')">점수 기록</button>
@@ -493,7 +516,7 @@ body.bigmode .line-board > :nth-child(6).line-item.lt .dot-r{right:18px}
         <div class="g-steps">
           <div class="g-step"><div><b>학습카드</b><p>그림이나 영상을 보고 단어를 떠올립니다. "정답 보기"로 단어를 확인하고, "5초 생각하기"로 먼저 생각할 시간을 줄 수 있어요.</p></div></div>
           <div class="g-step"><div><b>짝맞추기</b><p>처음 미리보기 시간 동안 카드 위치를 외운 뒤, 같은 그림과 단어의 짝을 찾습니다. 화면 위의 <b>2쌍 · 4쌍 · 8쌍</b> 버튼으로 카드 수를 고를 수 있어요. 미리보기는 2쌍 2초, 4쌍 3초, 8쌍 5초입니다. 사진이나 올린 영상 파일이 있는 문제만 나오고, <b>유튜브 영상은 짝맞추기에서 빠집니다.</b></p></div></div>
-          <div class="g-step"><div><b>단어 퀴즈</b><p>그림을 보고 4개 중 맞는 단어를 고릅니다. 끝나면 이름을 적고 점수를 저장할 수 있어요.</p></div></div>
+          <div class="g-step"><div><b>퀴즈</b><p>한글 단어를 먼저 보고, 4개의 그림·영상 보기 중에서 알맞은 수어를 고릅니다. 끝나면 이름을 적고 점수를 저장할 수 있어요.</p></div></div>
           <div class="g-step"><div><b>점수 기록</b><p>학생별 평균과 최근 기록을 봅니다. 엑셀(CSV) 파일로 받을 수도 있어요.</p></div></div>
           <div class="g-step"><span class="g-ico">✏</span><div><b>문제 만들기</b><p>단어, 그림, 영상을 넣고 고치는 곳입니다.</p></div></div>
         </div>
@@ -536,7 +559,7 @@ body.bigmode .line-board > :nth-child(6).line-item.lt .dot-r{right:18px}
       <section class="g-sec">
         <h3>⑥ 큰 화면으로 보기</h3>
         <div class="g-steps">
-          <div class="g-step"><div><b>큰 화면 버튼</b><p>학습카드, 짝맞추기, 단어 퀴즈 화면마다 있습니다. 누르면 화면이 전체 화면으로 커집니다.</p></div></div>
+          <div class="g-step"><div><b>큰 화면 버튼</b><p>학습카드, 짝맞추기, 퀴즈 화면마다 있습니다. 누르면 화면이 전체 화면으로 커집니다.</p></div></div>
           <div class="g-step"><span class="g-ico">✕</span><div><b>끄기</b><p>"✕ 큰 화면 끄기" 버튼이나 Esc 키를 누르면 원래 화면으로 돌아갑니다.</p></div></div>
           <div class="g-step"><div><b>← → / 스페이스</b><p>학습카드에서 화살표로 넘기고, 스페이스로 정답을 보이거나 가립니다.</p></div></div>
         </div>
@@ -557,13 +580,13 @@ body.bigmode .line-board > :nth-child(6).line-item.lt .dot-r{right:18px}
       <section class="g-sec">
         <h3>⑧ 점수 기록 사용법</h3>
         <div class="g-steps">
-          <div class="g-step"><div><b>1. 단어 퀴즈 풀기</b><p>그림을 보고 보기 4개 중 알맞은 단어를 고릅니다. 맞히면 점수가 1점 올라가요.</p></div></div>
+          <div class="g-step"><div><b>1. 퀴즈 풀기</b><p>그림을 보고 보기 4개 중 알맞은 단어를 고릅니다. 맞히면 점수가 1점 올라가요.</p></div></div>
           <div class="g-step"><span class="g-ico">✍</span><div><b>2. 이름 적기</b><p>퀴즈가 끝나면 학생 이름을 적어 주세요. 비워 두면 "이름 없음"으로 저장됩니다.</p></div></div>
           <div class="g-step"><div><b>3. 점수 저장</b><p>" 점수 저장"을 누르면 기록에 남습니다. 저장 후에는 " 저장됨"으로 바뀝니다.</p></div></div>
-          <div class="g-step"><div><b>4. 기록 보기</b><p>단어 퀴즈 화면 아래의 " 최근 점수 보기"에서 최근 5건을 바로 볼 수 있어요. 전체는 메뉴의 " 점수 기록"에서 봅니다.</p></div></div>
+          <div class="g-step"><div><b>4. 기록 보기</b><p>퀴즈 화면 아래의 " 최근 점수 보기"에서 최근 5건을 바로 볼 수 있어요. 전체는 메뉴의 " 점수 기록"에서 봅니다.</p></div></div>
           <div class="g-step"><div><b>5. 엑셀로 받기</b><p>점수 기록 화면의 " 엑셀(CSV) 받기"를 누르면 파일로 저장되어 엑셀에서 열 수 있어요.</p></div></div>
         </div>
-        <div class="g-tip">점수는 <b>단어 퀴즈 · O,X 퀴즈 · 선 긋기 퀴즈</b>에서 저장됩니다. 학습카드와 짝맞추기는 점수가 남지 않아요.</div>
+        <div class="g-tip">점수는 <b>퀴즈 · O,X 퀴즈 · 선 긋기 퀴즈</b>에서 저장됩니다. 학습카드와 짝맞추기는 점수가 남지 않아요.</div>
         <div class="g-tip">점수 기록 화면 위의 <b>단원 칸</b>에서 "전체" 또는 단원 이름을 골라 보면, 그 단원의 기록만 따로 볼 수 있어요.</div>
         <div class="g-tip"><b>전체 엑셀 받기</b>는 모든 기록을, <b>단원별 엑셀 받기</b>는 단원 칸에서 고른 단원의 기록만 파일로 받습니다. 파일 이름에 단원 이름이 들어가요.</div>
         <div class="g-tip">점수는 <b>지금 쓰는 컴퓨터(브라우저)에만</b> 저장됩니다. 다른 컴퓨터에서는 보이지 않으니 중요한 기록은 엑셀로 받아 두세요. 기록은 줄별로 삭제할 수 있고, "전체 지우기"는 되돌릴 수 없어요.</div>
@@ -987,7 +1010,7 @@ function flip(i){
   }
 }
 
-// ---------- 공통: 결과 화면 · 점수 저장 (O,X · 선 긋기 · 단어 퀴즈) ----------
+// ---------- 공통: 결과 화면 · 점수 저장 (O,X · 선 긋기 · 퀴즈) ----------
 function resultHtml(title, score, total, again){
   const msg = score / total >= 0.8 ? '아주 잘했어요! ' : '조금 더 연습해 볼까요? ';
   return `<section class="card stage">
@@ -1034,7 +1057,7 @@ function viewOX(){
     </div>
     <div class="progress"><span style="width:${oxIdx / oxList.length * 100}%"></span></div>
     <div class="frame">${media(oxCur.it)}</div>
-    <p class="quiz-q">이 수어는 <b class="ox-word">${esc(oxCur.word)}</b> 일까요?</p>
+    <p class="quiz-q">이 수어는 <b class="ox-word${[...oxCur.word].length > 24 ? ' xlong' : [...oxCur.word].length > 12 ? ' long' : ''}">${esc(oxCur.word)}</b> 일까요?</p>
     <div class="ox-row">
       <button class="ox-btn ox-o" onclick="answerOX(true)">O</button>
       <button class="ox-btn ox-x" onclick="answerOX(false)">X</button>
@@ -1092,7 +1115,9 @@ function viewLine(){
   const rightHtml = lnR.map((k, pos)=>{
     const linked = Object.keys(lnLink).find(l=>lnLink[l] === pos);
     const st = (lnChecked && linked !== undefined) ? (lnCorrect(linked) ? 'ok' : 'ng') : '';
-    return `<button class="line-item rt ${st}${linked !== undefined ? ' linked' : ''}${lnRSel === pos ? ' sel' : ''}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span><span class="dot dot-l"></span></button>`;
+    const wl = [...lnL[k].word].length;
+    const lenCls = wl > 24 ? ' xlong' : wl > 12 ? ' long' : '';
+    return `<button class="line-item rt ${st}${lenCls}${linked !== undefined ? ' linked' : ''}${lnRSel === pos ? ' sel' : ''}" data-r="${pos}" onclick="pickR(${pos})"><span class="w">${esc(lnL[k].word)}</span><span class="dot dot-l"></span></button>`;
   });
   main.innerHTML = `<section class="card stage">
     <div class="head-row">
@@ -1182,12 +1207,12 @@ function drawLines(){
 }
 window.addEventListener('resize', ()=>{ if(current === 'line') drawLines(); });
 
-// ---------- 3. 단어 퀴즈 ----------
-let qList = [], qIdx = 0, qScore = 0, qAnswered = false, qCur = null;
+// ---------- 3. 퀴즈 ----------
+let qList = [], qIdx = 0, qScore = 0, qAnswered = false, qCur = null, qStart = 0;
 function startQuiz(){
   const p = pool();
   if(p.length<2){ main.innerHTML = needMore(); return; }
-  qList = shuffle(p); qIdx = 0; qScore = 0; viewQuiz();
+  qList = shuffle(p); qIdx = 0; qScore = 0; qStart = Math.random() < 0.5 ? 0 : 1; viewQuiz();
 }
 function viewQuiz(){
   if(qIdx >= qList.length){
@@ -1208,6 +1233,7 @@ function viewQuiz(){
   }
   qAnswered = false;
   qCur = qList[qIdx];
+  const wordMode = (qIdx + qStart) % 2 === 0; // 문제마다 두 방식이 번갈아 나옴
   const pct = qIdx / qList.length * 100;
   const wrong = shuffle(pool().filter(x=>x.id !== qCur.id)).slice(0,3);
   const opts = shuffle([qCur, ...wrong]);
@@ -1217,23 +1243,33 @@ function viewQuiz(){
       ${bigBtn()}
     </div>
     <div class="progress"><span style="width:${pct}%"></span></div>
-    <div class="frame">${media(qCur)}</div>
+    ${wordMode ? `<p class="quiz-word${[...qCur.word].length > 24 ? ' xlong' : [...qCur.word].length > 12 ? ' long' : ''}">&#8216;${esc(qCur.word)}&#8217; 수어를 찾아보세요</p>
+    <div class="qopts">${opts.map(o=>`<div class="qopt" data-id="${o.id}" onclick="answer(this,${o.id})">${optMedia(o)}</div>`).join('')}</div>`
+      : `<div class="frame">${media(qCur)}</div>
     <p class="quiz-q">무슨 단어일까요?</p>
-    <div class="opts">${opts.map(o=>`<button class="opt" onclick="answer(this,${o.id})">${esc(o.word)}</button>`).join('')}</div>
+    <div class="opts">${opts.map(o=>`<button class="opt" data-id="${o.id}" onclick="answer(this,${o.id})">${esc(o.word)}</button>`).join('')}</div>`}
     <p id="fb" class="feedback"></p>
     <button class="btn btn-primary" id="nextBtn" style="visibility:hidden" onclick="nextQ()">다음 ▶</button>
     ${recentBox()}
   </section>`;
   hydrate();
 }
-function answer(btn, id){
+// 퀴즈 보기 한 칸: 사진 · 올린 영상 · 유튜브(썸네일, 재생 버튼)
+function optMedia(it){
+  if((it.img || '').startsWith('data:')) return `<img src="${it.img}" alt="">`;
+  if(it.hasVideo) return `<video class="thumb-vid" data-vid="${it.id}" autoplay muted loop playsinline></video>`;
+  const yt = it.videoUrl ? ytId(it.videoUrl) : null;
+  if(yt) return `<div class="yt-wrap" data-src="${ytEmbed(it, yt)}"><img class="yt-thumb" src="https://img.youtube.com/vi/${yt}/hqdefault.jpg" alt=""><button type="button" class="yt-play" onclick="event.stopPropagation();ytPlay(this)">&#9654; 재생</button></div>`;
+  return `<span class="noimg">${esc(it.word)}</span>`;
+}
+function answer(el, id){
   if(qAnswered) return;
   qAnswered = true;
   const ok = id === qCur.id;
   if(ok) qScore++;
-  btn.classList.add(ok ? 'right' : 'wrong');
-  document.querySelectorAll('.opt').forEach(b=>{
-    if(b.textContent === qCur.word) b.classList.add('right');
+  el.classList.add(ok ? 'right' : 'wrong');
+  document.querySelectorAll('.qopt, .opt').forEach(b=>{
+    if(Number(b.dataset.id) === qCur.id) b.classList.add('right');
   });
   document.getElementById('fb').textContent = ok ? ' 정답이에요!' : ' 아쉬워요! 정답은 ' + qCur.word + ' 입니다';
   const nb = document.getElementById('nextBtn');
@@ -1249,7 +1285,7 @@ function recentBox(){
     <summary> 최근 점수 보기 (저장 ${scores.length}건)</summary>
     ${recs.length ? `<table>
       <tr><th>날짜</th><th>이름</th><th>단원</th><th>종류</th><th>점수</th></tr>
-      ${recs.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.kind || '단어 퀴즈')}</td><td>${r.score} / ${r.total}</td></tr>`).join('')}
+      ${recs.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.kind || '퀴즈')}</td><td>${r.score} / ${r.total}</td></tr>`).join('')}
     </table>` : '<p class="hint">아직 저장된 점수가 없어요. 결과 화면에서  점수 저장을 눌러 보세요.</p>'}
     <button class="btn btn-ghost sm" onclick="go('scores')">전체 점수 기록 열기</button>
   </details>`;
@@ -1264,7 +1300,8 @@ function saveScore(){
     name: name,
     unit: unit,
     score: qScore,
-    total: qList.length
+    total: qList.length,
+    kind: '퀴즈'
   });
   if(!saveScores()) return;
   const b = document.getElementById('saveBtn');
@@ -1309,12 +1346,12 @@ function viewScores(){
         const p = Math.round(a.reduce((s,r)=>s + r.score/r.total, 0) / a.length * 100);
         return `<tr><td>${esc(n)}</td><td>${a.length}회</td><td>${p}%</td></tr>`;
       }).join('')}
-    </table></div>` : '<p class="hint">아직 기록이 없어요. 단어 퀴즈를 끝내고 점수를 저장해 보세요.</p>'}
+    </table></div>` : '<p class="hint">아직 기록이 없어요. 퀴즈를 끝내고 점수를 저장해 보세요.</p>'}
     ${total ? `<h3 class="sub">최근 기록</h3>
     <div class="table-wrap"><table>
       <tr><th>날짜</th><th>이름</th><th>단원</th><th>종류</th><th>점수</th><th></th></tr>
       ${recs.map(r=>`<tr>
-        <td>${esc(r.date)}</td><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.kind || '단어 퀴즈')}</td>
+        <td>${esc(r.date)}</td><td>${esc(r.name)}</td><td>${esc(r.unit)}</td><td>${esc(r.kind || '퀴즈')}</td>
         <td>${r.score} / ${r.total}</td>
         <td><button class="btn btn-danger sm" onclick="delScore(${r.id})">삭제</button></td>
       </tr>`).join('')}
@@ -1340,7 +1377,7 @@ function exportScores(mode){
   }
   if(!list.length){ alert('받을 기록이 없어요.'); return; }
   const head = '날짜,이름,단원,종류,점수,전체,정답률\n';
-  const rows = list.map(r=>[r.date, r.name, r.unit, r.kind || '단어 퀴즈', r.score, r.total, Math.round(r.score/r.total*100)+'%'].join(','));
+  const rows = list.map(r=>[r.date, r.name, r.unit, r.kind || '퀴즈', r.score, r.total, Math.round(r.score/r.total*100)+'%'].join(','));
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['\uFEFF' + head + rows.join('\n')], {type:'text/csv;charset=utf-8'}));
   a.download = fname;
