@@ -393,6 +393,16 @@ body.bigmode .line-board .line-vid{height:calc(100% - 52px);min-height:0;width:1
 body.bigmode .line-board .line-item.lt img{height:100%;width:auto;max-width:100%}
 body.bigmode .line-board .line-item.rt{height:100%;min-height:0;font-size:clamp(22px,2.6vw,44px)}
 body.bigmode .line-board .pick-bar{font-size:clamp(14px,1.4vw,20px);padding:8px 0}
+
+/* 선 긋기: 유튜브 썸네일 + 재생 버튼 (칸 어디를 눌러도 선택됨) */
+.yt-wrap{position:relative;overflow:hidden;cursor:pointer}
+.yt-wrap .yt-thumb{width:100%;height:100%;object-fit:cover;display:block}
+.yt-wrap .yt-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:0;border-radius:999px;padding:10px 22px;font-size:16px;font-weight:800;color:#fff;background:rgba(224,49,49,.92);box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;font-family:inherit}
+.yt-wrap .yt-play:hover{background:#e03131}
+.line-board > .line-item.lt:nth-child(4n+3),
+.line-board > .line-item.rt:nth-child(4n){transform:translateX(4vw)}
+body.bigmode .line-board > .line-item.lt:nth-child(4n+3),
+body.bigmode .line-board > .line-item.rt:nth-child(4n){transform:translateX(4vw)}
 </style>
 </head>
 <body>
@@ -1018,8 +1028,8 @@ function viewLine(){
       // 영상 문제: 네모칸 안에서 바로 재생, 아래 '이 칸 선택'을 눌러 선 잇기
       const yt = it.videoUrl ? ytId(it.videoUrl) : null;
       const player = it.hasVideo
-        ? `<video class="line-vid" data-vid="${it.id}" controls playsinline preload="metadata" onclick="event.stopPropagation()"></video>`
-        : (yt ? `<div class="line-vid yt-wrap"><iframe class="yt-frame" src="${ytEmbed(it, yt)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
+        ? `<video class="line-vid" data-vid="${it.id}" controls playsinline preload="metadata"></video>`
+        : (yt ? `<div class="line-vid yt-wrap" data-src="${ytEmbed(it, yt)}"><img class="yt-thumb" src="https://img.youtube.com/vi/${yt}/hqdefault.jpg" alt=""><button type="button" class="yt-play" onclick="event.stopPropagation();ytPlay(this)">&#9654; 재생</button></div>`
               : `<span class="noimg">영상 링크를 확인하세요</span>`);
       inner = player + `<span class="pick-bar">이 칸 선택</span>`;
       cls += ' isvid';
@@ -1054,6 +1064,17 @@ function viewLine(){
   </section>`;
   drawLines();
   hydrate();
+}
+function ytPlay(btn){
+  const w = btn.closest('.yt-wrap');
+  if(!w) return;
+  const f = document.createElement('iframe');
+  f.className = 'yt-frame';
+  f.src = w.dataset.src + '&autoplay=1';
+  f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+  f.setAttribute('allowfullscreen', '');
+  w.innerHTML = '';
+  w.appendChild(f);
 }
 function pickL(i){
   if(lnChecked) return;
