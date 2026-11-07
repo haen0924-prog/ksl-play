@@ -736,7 +736,7 @@ function ytId(url){
 function media(it){
   if(it.videoUrl){
     const id = ytId(it.videoUrl);
-    if(id) return `<div class="vid yt-wrap"><iframe class="yt-frame" src="${ytEmbed(it, id)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="yt-cover" data-p="0" onclick="ytToggle(this)"></div></div>`;
+    if(id) return `<div class="vid yt-wrap"><iframe class="yt-frame" src="${ytEmbed(it, id)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
     return `<a class="btn btn-primary" href="${esc(it.videoUrl)}" target="_blank" rel="noopener"> 영상 열기</a>`;
   }
   if(it.hasVideo) return `<video class="vid" data-vid="${it.id}" controls playsinline></video>`;
@@ -1009,7 +1009,7 @@ function viewLine(){
       const yt = it.videoUrl ? ytId(it.videoUrl) : null;
       const player = it.hasVideo
         ? `<video class="line-vid" data-vid="${it.id}" controls playsinline preload="metadata" onclick="event.stopPropagation()"></video>`
-        : (yt ? `<div class="line-vid yt-wrap"><iframe class="yt-frame" src="${ytEmbed(it, yt)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="yt-cover" data-p="0" onclick="ytToggle(this)"></div></div>`
+        : (yt ? `<div class="line-vid yt-wrap"><iframe class="yt-frame" src="${ytEmbed(it, yt)}" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
               : `<span class="noimg">영상 링크를 확인하세요</span>`);
       inner = player + `<span class="pick-bar">이 칸 선택</span>`;
       cls += ' isvid';
