@@ -443,6 +443,12 @@ body.bigmode .line-board .line-item .dot-l{left:-36px}
 body.bigmode .line-board{max-width:none;width:100%;height:calc(100vh - 160px);min-height:420px;grid-template-rows:repeat(9,minmax(0,1fr));column-gap:clamp(28px,3vw,56px);row-gap:0}
 body.bigmode .line-board > .line-item.rt{height:50%;font-size:clamp(11px,1.3vw,22px)}
 body.bigmode .line-board .line-vid{height:auto;flex:1 1 auto}
+
+/* 선 긋기: 가운데(오른쪽) 영상 칸의 점은 영상 위에 올림 */
+.line-board > :nth-child(4).line-item.lt .dot-r,
+.line-board > :nth-child(8).line-item.lt .dot-r{right:14px}
+body.bigmode .line-board > :nth-child(4).line-item.lt .dot-r,
+body.bigmode .line-board > :nth-child(8).line-item.lt .dot-r{right:18px}
 </style>
 </head>
 <body>
