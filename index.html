@@ -457,25 +457,20 @@ body.bigmode .line-board > :nth-child(6).line-item.lt .dot-r{right:18px}
 /* 퀴즈: 단어를 먼저 보여주고 그림·영상 4개 중 고르기 */
 .quiz-word{font-size:clamp(26px,3vw,40px);font-weight:900;color:#1864ab;text-align:center;margin:18px 0 14px}
 .qopts{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:960px;margin:0 auto}
+.qcell{display:flex;flex-direction:column;gap:8px}
 .qopt{position:relative;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#000;border:4px solid #d0ebff;cursor:pointer;transition:transform .12s}
 .qopt:hover{transform:translateY(-2px)}
 .qopt img,.qopt video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
 .qopt .yt-wrap{position:absolute;inset:0;height:auto}
 .qopt .yt-wrap .yt-thumb{width:100%;height:100%;object-fit:contain;background:#000}
 .qopt .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:800}
-.qopt.right{border-color:#40c057;box-shadow:0 0 0 4px #ebfbee}
-.qopt.wrong{border-color:#fa5252;box-shadow:0 0 0 4px #fff5f5}
-.qopts:has(.qopt.right, .qopt.wrong) .qopt:not(.right):not(.wrong){opacity:.55}
-
-/* 긴 단어·문장: 길이에 따라 글자 크기를 자동으로 줄임 (칸은 글자에 맞춰 늘어남) */
-.line-board .line-item.rt.long{font-size:15px;line-height:1.35}
-.line-board .line-item.rt.xlong{font-size:12px;line-height:1.35}
-body.bigmode .line-board > .line-item.rt.long{font-size:clamp(9px,1vw,17px)}
-body.bigmode .line-board > .line-item.rt.xlong{font-size:clamp(8px,0.8vw,13px)}
-.quiz-word.long{font-size:clamp(20px,2.2vw,30px)}
-.quiz-word.xlong{font-size:clamp(17px,1.8vw,24px)}
-.ox-word.long{font-size:0.8em}
-.ox-word.xlong{font-size:0.62em}
+.qpick{padding:8px 12px;border-radius:12px;border:2px solid #74c0fc;background:#e7f5ff;color:#1864ab;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+.qpick:hover{background:#d0ebff}
+.qcell.right .qopt{border-color:#40c057;box-shadow:0 0 0 4px #ebfbee}
+.qcell.wrong .qopt{border-color:#fa5252;box-shadow:0 0 0 4px #fff5f5}
+.qcell.right .qpick{background:#ebfbee;border-color:#40c057;color:#2b8a3e}
+.qcell.wrong .qpick{background:#fff5f5;border-color:#fa5252;color:#c92a2a}
+.qopts:has(.qcell.right, .qcell.wrong) .qcell:not(.right):not(.wrong){opacity:.55}
 </style>
 </head>
 <body>
@@ -1244,7 +1239,7 @@ function viewQuiz(){
     </div>
     <div class="progress"><span style="width:${pct}%"></span></div>
     ${wordMode ? `<p class="quiz-word${[...qCur.word].length > 24 ? ' xlong' : [...qCur.word].length > 12 ? ' long' : ''}">&#8216;${esc(qCur.word)}&#8217; 수어를 찾아보세요</p>
-    <div class="qopts">${opts.map(o=>`<div class="qopt" data-id="${o.id}" onclick="answer(this,${o.id})">${optMedia(o)}</div>`).join('')}</div>`
+    <div class="qopts">${opts.map(o=>`<div class="qcell" data-id="${o.id}"><div class="qopt" onclick="answer(this,${o.id})">${optMedia(o)}</div><button type="button" class="qpick" onclick="answer(this,${o.id})">이 보기 고르기</button></div>`).join('')}</div>`
       : `<div class="frame">${media(qCur)}</div>
     <p class="quiz-q">무슨 단어일까요?</p>
     <div class="opts">${opts.map(o=>`<button class="opt" data-id="${o.id}" onclick="answer(this,${o.id})">${esc(o.word)}</button>`).join('')}</div>`}
@@ -1267,8 +1262,9 @@ function answer(el, id){
   qAnswered = true;
   const ok = id === qCur.id;
   if(ok) qScore++;
-  el.classList.add(ok ? 'right' : 'wrong');
-  document.querySelectorAll('.qopt, .opt').forEach(b=>{
+  const cell = el.closest('.qcell') || el;
+  cell.classList.add(ok ? 'right' : 'wrong');
+  document.querySelectorAll('.qcell, .opt').forEach(b=>{
     if(Number(b.dataset.id) === qCur.id) b.classList.add('right');
   });
   document.getElementById('fb').textContent = ok ? ' 정답이에요!' : ' 아쉬워요! 정답은 ' + qCur.word + ' 입니다';
